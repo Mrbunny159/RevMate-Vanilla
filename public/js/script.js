@@ -12,7 +12,8 @@ import {
     loginWithApple,
     setupRecaptcha,
     sendPhoneVerificationCode,
-    verifyPhoneCode
+    verifyPhoneCode,
+    processAuthRedirect
 } from './firebase-auth.js';
 
 import {
@@ -338,8 +339,8 @@ function renderMyRides(type = 'hosted') {
     
     if (filteredRides.length === 0) {
         const emptyMessage = type === 'hosted' 
-            ? 'You haven\'t hosted any rides yet. Create one from the Host section!'
-            : 'You haven\'t joined any rides yet. Explore the Discover section!';
+            ? 'You\'haven\'t hosted any rides yet. Create one from the Host section!'
+            : 'You\'haven\'t joined any rides yet. Explore the Discover section!';
         
         container.innerHTML = `
             <div class="empty-rides">
@@ -993,6 +994,11 @@ async function handleLogout() {
 function initApp() {
     // Apply saved theme on load
     applySavedTheme();
+    
+    // Process OAuth redirect result (WebView Google Sign-In)
+    processAuthRedirect().catch(err => {
+        console.error('Error processing auth redirect:', err);
+    });
     
     // Initialize Profile section event listeners
     const saveProfileBtn = document.getElementById('saveProfile');

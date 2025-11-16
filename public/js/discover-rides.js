@@ -3,8 +3,9 @@
 // ============================================
 
 import { db } from './firebase-config.js';
-import { collection, getDocs, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+import { collection, getDocs, onSnapshot, doc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 import { getCurrentUserId } from './firebase-auth.js';
+import { joinRide, leaveRide } from './firebase-db.js';
 
 /**
  * Fetch all public rides from Firestore
@@ -173,15 +174,6 @@ function renderRides(rides) {
   });
 }
 
-/**
- * Handle join ride action
- * @param {string} rideId - ID of the ride to join
- * @param {string} rideTitle - Title of the ride
- */
-function handleJoinRide(rideId, rideTitle) {
-  const message = `You've expressed interest to join "${rideTitle}". Ride ID: ${rideId}.`;
-  showRideNotification(message, 'info');
-}
 
 // Utility to obtain current user id from localStorage
 function getCurrentUid() {
@@ -209,35 +201,8 @@ function getCurrentUid() {
   return null;
 }
 
-// Join a ride (adds current user to participants array)
-async function joinRide(rideId, btn) {
-  const uid = getCurrentUid();
-  if (!uid) { showRideNotification('Please sign in to join rides', 'error'); return; }
-  try {
-    const rideRef = doc(db, 'rides', rideId);
-    await updateDoc(rideRef, { participants: arrayUnion(uid) });
-    showRideNotification('Joined ride', 'success');
-    // button state will update automatically via real-time listener
-  } catch (err) {
-    console.error('joinRide error:', err);
-    const msg = err && err.message ? `Unable to join ride: ${err.message}` : 'Unable to join ride';
-    showRideNotification(msg, 'error');
-  }
-}
-
-// Leave a ride (removes current user from participants array)
-async function leaveRide(rideId, btn) {
-  const uid = getCurrentUid();
-  if (!uid) { showRideNotification('Please sign in to cancel join', 'error'); return; }
-  try {
-    const rideRef = doc(db, 'rides', rideId);
-    await updateDoc(rideRef, { participants: arrayRemove(uid) });
-    showRideNotification('Left ride', 'success');
-  } catch (err) {
-    console.error('leaveRide error:', err);
-    showRideNotification('Unable to cancel join', 'error');
-  }
-}
+// joinRide and leaveRide are provided by `firebase-db.js` to keep DB logic centralized
+// imported earlier: `import { joinRide, leaveRide } from './firebase-db.js';
 
 /**
  * Show notification using custom UI (WebView-friendly)
@@ -297,4 +262,4 @@ export async function refreshDiscoverRides() {
 }
 
 // Export functions for external use
-export { loadRides, renderRides, handleJoinRide };
+export { loadRides, renderRides };

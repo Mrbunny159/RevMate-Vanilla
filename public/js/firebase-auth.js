@@ -11,9 +11,11 @@ import {
     GoogleAuthProvider,
     OAuthProvider,
     signInWithPopup,
+    signInWithRedirect,
     RecaptchaVerifier,
     signInWithPhoneNumber
 } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+import { isWebView, handleAuthRedirect, logWebViewDebug } from './webview-helper.js';
 
 import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 
@@ -121,20 +123,63 @@ export function getCurrentUserId() {
 }
 
 /**
- * Login with Google
+ * Process OAuth redirect result (called on app load)
+ * Handles the redirect back from Google Sign-In in WebView
+ * @returns {Promise} User data if redirected back, null if fresh session
+ */
+export async function processAuthRedirect() {
+    if (isWebView()) {
+        logWebViewDebug('PROCESS_REDIRECT_INIT', {});
+        const redirectResult = await handleAuthRedirect(auth);
+        
+        if (redirectResult && redirectResult.success) {
+            logWebViewDebug('REDIRECT_SUCCESS', { uid: redirectResult.user.id });
+            return redirectResult.user;
+        }
+    }
+    return null;
+}
+
+/**
+ * Login with Google - Hybrid flow for WebView & Desktop
+ * Uses signInWithPopup on desktop, signInWithRedirect in WebView
  * @returns {Promise} User data or error
  */
 export async function loginWithGoogle() {
     try {
         const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
+        const webview = isWebView();
+        
+        logWebViewDebug('GOOGLE_LOGIN_START', { isWebView: webview });
+        
+        let result;
+        
+        if (webview) {
+            // WebView: Use redirect flow (opens external browser)
+            console.log('📱 WebView detected - using redirect flow');
+            logWebViewDebug('REDIRECT_FLOW_INITIATED', { method: 'signInWithRedirect' });
+            await signInWithRedirect(auth, provider);
+            // After redirect back, handleAuthRedirect() is called on app load
+            return {
+                success: true,
+                message: 'Redirecting to Google Sign-In...'
+            };
+        } else {
+            // Desktop: Use popup flow (inline auth dialog)
+            console.log('🖥️ Desktop browser detected - using popup flow');
+            logWebViewDebug('POPUP_FLOW_INITIATED', { method: 'signInWithPopup' });
+            result = await signInWithPopup(auth, provider);
+        }
+        
         const user = result.user;
+        logWebViewDebug('AUTH_SUCCESS', { uid: user.uid, email: user.email });
         
         // Check if user document exists in Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         
         if (!userDoc.exists()) {
             // Create user document if it's a new user
+            logWebViewDebug('CREATE_FIRESTORE_DOC', { uid: user.uid });
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: user.displayName || 'User',
@@ -153,6 +198,8 @@ export async function loginWithGoogle() {
             following: []
         };
         
+        logWebViewDebug('LOGIN_COMPLETE', { success: true });
+        
         return {
             success: true,
             user: {
@@ -164,6 +211,13 @@ export async function loginWithGoogle() {
             }
         };
     } catch (error) {
+        logWebViewDebug('LOGIN_ERROR', {
+            code: error.code,
+            message: error.message
+        });
+        
+        console.error('❌ Google login error:', error.code, error.message);
+        
         return {
             success: false,
             error: error.message
