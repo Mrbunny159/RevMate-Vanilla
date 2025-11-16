@@ -1,0 +1,61 @@
+type User @table {
+  username: String!
+  email: String!
+  passwordHash: String!
+  createdAt: Timestamp!
+  displayName: String
+  bio: String
+  photoUrl: String
+  ridingStyle: String
+  bikeType: String
+  currentLocation: String
+}
+
+type Route @table {
+  name: String!
+  description: String!
+  createdAt: Timestamp!
+  isPublic: Boolean!
+  lengthMiles: Float
+  estimatedDuration: Int
+  startLocation: String
+  endLocation: String
+  gpxDataUrl: String
+  creator: User
+}
+
+type Waypoint @table {
+  latitude: Float!
+  longitude: Float!
+  orderIndex: Int!
+  name: String
+  description: String
+  route: Route
+}
+
+type GroupRide @table {
+  name: String!
+  scheduledDateTime: Timestamp!
+  createdAt: Timestamp!
+  isPublic: Boolean!
+  description: String
+  meetingPoint: String
+  maxAttendees: Int
+  creator: User
+  route: Route
+}
+
+type RideAttendee @table(key: ["user", "groupRide"]) {
+  joinedAt: Timestamp!
+  user: User!
+  groupRide: GroupRide!
+}
+
+type Comment @table {
+  content: String!
+  createdAt: Timestamp!
+  parentComment: Comment
+  user: User
+  route: Route
+  groupRide: GroupRide
+}

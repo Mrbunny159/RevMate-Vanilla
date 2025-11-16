@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "avishkar-c9826"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  }
+}
