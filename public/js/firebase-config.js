@@ -26,6 +26,13 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+// Configure Auth for WebView compatibility
+// This ensures session persistence works correctly in WebView environments
+auth.setPersistence = undefined; // Reset to default (LOCAL persistence)
+if (typeof auth.settings !== 'undefined') {
+  auth.settings.appVerificationDisabledForTesting = false;
+}
+
 // Export Firebase services for use in other modules
 // expose db on window for modules that expect window.db
 if (typeof window !== 'undefined') window.db = db;

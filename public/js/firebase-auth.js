@@ -150,6 +150,13 @@ export async function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         const webview = isWebView();
         
+        // Configure provider scopes for better compatibility
+        provider.addScope('email');
+        provider.addScope('profile');
+        provider.setCustomParameters({
+            'prompt': 'consent'
+        });
+        
         logWebViewDebug('GOOGLE_LOGIN_START', { isWebView: webview });
         
         let result;
@@ -157,7 +164,11 @@ export async function loginWithGoogle() {
         if (webview) {
             // WebView: Use redirect flow (opens external browser)
             console.log('📱 WebView detected - using redirect flow');
-            logWebViewDebug('REDIRECT_FLOW_INITIATED', { method: 'signInWithRedirect' });
+            console.log('ℹ️ Make sure your website wrapper is configured to open Google auth in external browser');
+            logWebViewDebug('REDIRECT_FLOW_INITIATED', { 
+                method: 'signInWithRedirect',
+                scopes: ['email', 'profile']
+            });
             await signInWithRedirect(auth, provider);
             // After redirect back, handleAuthRedirect() is called on app load
             return {
@@ -217,6 +228,11 @@ export async function loginWithGoogle() {
         });
         
         console.error('❌ Google login error:', error.code, error.message);
+        
+        // Provide helpful error message for WebView popup-blocked errors
+        if (error.code === 'auth/popup-blocked') {
+            console.error('⚠️ Popup was blocked. In WebView wrappers, ensure Google authentication domains are whitelisted to open in external browser.');
+        }
         
         return {
             success: false,
