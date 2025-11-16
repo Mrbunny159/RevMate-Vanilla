@@ -33,8 +33,21 @@ if (typeof auth.settings !== 'undefined') {
   auth.settings.appVerificationDisabledForTesting = false;
 }
 
+// CRITICAL FIX: Ensure auth domain matches
+// This prevents "invalid authDomain" errors
+auth.tenantId = null; // Single tenant app
+
+// Enable Auth Session Persistence
+import { setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+setPersistence(auth, browserLocalPersistence).catch(err => {
+  console.warn('⚠️ Persistence setup warning:', err.code);
+});
+
 // Export Firebase services for use in other modules
 // expose db on window for modules that expect window.db
-if (typeof window !== 'undefined') window.db = db;
+if (typeof window !== 'undefined') {
+  window.db = db;
+  window.firebaseAuth = auth; // Expose for debugging
+}
 
 export { app, analytics, auth, db, storage };

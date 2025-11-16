@@ -143,6 +143,7 @@ export async function processAuthRedirect() {
 /**
  * Login with Google - Hybrid flow for WebView & Desktop
  * Uses signInWithPopup on desktop, signInWithRedirect in WebView
+ * Includes fallback for popup-blocked errors
  * @returns {Promise} User data or error
  */
 export async function loginWithGoogle() {
@@ -150,11 +151,12 @@ export async function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         const webview = isWebView();
         
-        // Configure provider scopes for better compatibility
+        // Configure provider for maximum compatibility
         provider.addScope('email');
         provider.addScope('profile');
         provider.setCustomParameters({
-            'prompt': 'consent'
+            'prompt': 'select_account', // Let user choose account
+            'access_type': 'offline'
         });
         
         logWebViewDebug('GOOGLE_LOGIN_START', { isWebView: webview });
@@ -164,22 +166,59 @@ export async function loginWithGoogle() {
         if (webview) {
             // WebView: Use redirect flow (opens external browser)
             console.log('📱 WebView detected - using redirect flow');
-            console.log('ℹ️ Make sure your website wrapper is configured to open Google auth in external browser');
             logWebViewDebug('REDIRECT_FLOW_INITIATED', { 
                 method: 'signInWithRedirect',
                 scopes: ['email', 'profile']
             });
-            await signInWithRedirect(auth, provider);
-            // After redirect back, handleAuthRedirect() is called on app load
-            return {
-                success: true,
-                message: 'Redirecting to Google Sign-In...'
-            };
+            
+            try {
+                await signInWithRedirect(auth, provider);
+                // After redirect back, handleAuthRedirect() is called on app load
+                return {
+                    success: true,
+                    message: 'Redirecting to Google Sign-In...'
+                };
+            } catch (redirectError) {
+                console.error('❌ Redirect flow error:', redirectError.code, redirectError.message);
+                logWebViewDebug('REDIRECT_FLOW_ERROR', {
+                    code: redirectError.code,
+                    message: redirectError.message
+                });
+                
+                // If redirect fails, throw to show user error
+                throw redirectError;
+            }
         } else {
             // Desktop: Use popup flow (inline auth dialog)
             console.log('🖥️ Desktop browser detected - using popup flow');
             logWebViewDebug('POPUP_FLOW_INITIATED', { method: 'signInWithPopup' });
-            result = await signInWithPopup(auth, provider);
+            
+            try {
+                result = await signInWithPopup(auth, provider);
+            } catch (popupError) {
+                console.error('❌ Popup error:', popupError.code, popupError.message);
+                logWebViewDebug('POPUP_ERROR', {
+                    code: popupError.code,
+                    message: popupError.message
+                });
+                
+                // If popup blocked, try redirect as fallback
+                if (popupError.code === 'auth/popup-blocked') {
+                    console.log('⚠️ Popup blocked - trying redirect as fallback');
+                    logWebViewDebug('POPUP_BLOCKED_FALLBACK', { 
+                        method: 'signInWithRedirect'
+                    });
+                    
+                    await signInWithRedirect(auth, provider);
+                    return {
+                        success: true,
+                        message: 'Redirecting to Google Sign-In...'
+                    };
+                }
+                
+                // Other popup errors
+                throw popupError;
+            }
         }
         
         const user = result.user;
@@ -229,14 +268,34 @@ export async function loginWithGoogle() {
         
         console.error('❌ Google login error:', error.code, error.message);
         
-        // Provide helpful error message for WebView popup-blocked errors
-        if (error.code === 'auth/popup-blocked') {
-            console.error('⚠️ Popup was blocked. In WebView wrappers, ensure Google authentication domains are whitelisted to open in external browser.');
+        // User-friendly error messages
+        let userMessage = error.message;
+        
+        switch(error.code) {
+            case 'auth/popup-blocked':
+                userMessage = 'Popup was blocked. Your browser blocked the sign-in window. Please allow popups and try again, or check your popup blocker settings.';
+                break;
+            case 'auth/cancelled-popup-request':
+                userMessage = 'Sign-in was cancelled. Please try again.';
+                break;
+            case 'auth/operation-not-supported-in-this-environment':
+                userMessage = 'Sign-in is not supported in this environment. Please try a different browser.';
+                break;
+            case 'auth/auth-domain-config-required':
+                userMessage = 'Firebase is not properly configured for this domain. Contact support.';
+                break;
+            case 'auth/invalid-api-key':
+                userMessage = 'Firebase configuration error. Contact support.';
+                break;
+            case 'auth/network-request-failed':
+                userMessage = 'Network error. Please check your internet connection.';
+                break;
         }
         
         return {
             success: false,
-            error: error.message
+            error: userMessage,
+            code: error.code
         };
     }
 }
@@ -251,7 +310,24 @@ export async function loginWithApple() {
         provider.addScope('email');
         provider.addScope('name');
         
-        const result = await signInWithPopup(auth, provider);
+        logWebViewDebug('APPLE_LOGIN_START', {});
+        
+        let result;
+        try {
+            result = await signInWithPopup(auth, provider);
+        } catch (popupError) {
+            if (popupError.code === 'auth/popup-blocked') {
+                console.log('⚠️ Apple popup blocked - trying redirect fallback');
+                logWebViewDebug('APPLE_POPUP_BLOCKED_FALLBACK', {});
+                await signInWithRedirect(auth, provider);
+                return {
+                    success: true,
+                    message: 'Redirecting to Apple Sign-In...'
+                };
+            }
+            throw popupError;
+        }
+        
         const user = result.user;
         
         // Check if user document exists in Firestore
