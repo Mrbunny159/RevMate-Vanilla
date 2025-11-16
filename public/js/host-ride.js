@@ -6,9 +6,12 @@ import {
   addDoc,
   getDocs,
   Timestamp,
-  GeoPoint
+  GeoPoint,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getCurrentUserId } from './firebase-auth.js';
+import { getStartLocation, getEndLocation, onLocationsChanged, ensureMapsReady, initializeMaps } from './maps.js';
+import { saveRide } from './rides.js';
 
 // Small HTML-escaped helper
 function escapeHtml(text) {
@@ -59,18 +62,18 @@ export async function hostRide() {
   try {
     const titleEl = document.getElementById('rideTitle');
     const dateEl = document.getElementById('rideDateTime');
-    const latEl = document.getElementById('latitude');
-    const lngEl = document.getElementById('longitude');
+    const startInputEl = document.getElementById('startLocationInput');
+    const endInputEl = document.getElementById('endLocationInput');
 
-    if (!titleEl || !dateEl || !latEl || !lngEl) {
+    if (!titleEl || !dateEl || !startInputEl || !endInputEl) {
       showInlineMessage('Host form fields are not found in the page.', { type: 'error' });
       return;
     }
 
     const title = titleEl.value?.trim();
     const dateValue = dateEl.value; // expected format from datetime-local
-    const latRaw = latEl.value?.trim();
-    const lngRaw = lngEl.value?.trim();
+    const startLocation = getStartLocation();
+    const endLocation = getEndLocation();
 
     if (!title) { showInlineMessage('Please enter a ride title.', { type: 'error', targetId: 'rideTitle' }); return; }
     if (!dateValue) { showInlineMessage('Please select date and time.', { type: 'error', targetId: 'rideDateTime' }); return; }
@@ -81,10 +84,8 @@ export async function hostRide() {
       return;
     }
 
-    const lat = parseFloat(latRaw);
-    const lng = parseFloat(lngRaw);
-    if (!isFinite(lat) || lat < -90 || lat > 90) { showInlineMessage('Latitude must be a number between -90 and 90.', { type: 'error', targetId: 'latitude' }); return; }
-    if (!isFinite(lng) || lng < -180 || lng > 180) { showInlineMessage('Longitude must be a number between -180 and 180.', { type: 'error', targetId: 'longitude' }); return; }
+    if (!startLocation || !startLocation.lat || !startLocation.lng) { showInlineMessage('Please select a valid start location.', { type: 'error', targetId: 'startLocationInput' }); return; }
+    if (!endLocation || !endLocation.lat || !endLocation.lng) { showInlineMessage('Please select a valid destination.', { type: 'error', targetId: 'endLocationInput' }); return; }
 
     // Determine organizerId: prefer `uid`, fallback to stored `currentUser` (object with id)
     // Prefer auth-based uid when available
@@ -122,30 +123,57 @@ export async function hostRide() {
       return;
     }
 
-    const rideObject = {
-      title: title,
-      rideDateTime: Timestamp.fromDate(dateObj),
-      startLocation: new GeoPoint(lat, lng),
+    // Ensure any maps data is ready (in case maps library hasn't finished loading)
+    await ensureMapsReady();
+
+    // Try to read last-calculated distance/duration from DOM (maps.js will update these)
+    const distanceText = document.getElementById('distanceText')?.textContent || '';
+    const durationText = document.getElementById('durationText')?.textContent || '';
+
+    // The maps module also exposes a small cached route result on window.__lastRoute (if available)
+    const lastRoute = window.__lastRoute || null;
+
+    const distanceKm = lastRoute?.distanceKm ?? null;
+    const durationMinutes = lastRoute?.durationMinutes ?? null;
+
+    const rideToSave = {
+      title,
+      rideDateTime: new Date(dateValue),
       isPublic: true,
       organizerId: organizerId,
-      hostId: organizerId,
       participants: [organizerId],
-      requests: []
+      requests: [],
+      startLocation: {
+        name: startLocation.name || '',
+        address: startLocation.address || '',
+        lat: Number(startLocation.lat),
+        lng: Number(startLocation.lng)
+      },
+      endLocation: {
+        name: endLocation.name || '',
+        address: endLocation.address || '',
+        lat: Number(endLocation.lat),
+        lng: Number(endLocation.lng)
+      },
+      distanceKm: distanceKm ?? null,
+      durationMinutes: durationMinutes ?? null,
+      createdAt: serverTimestamp()
     };
 
-    const colRef = collection(window.db, 'rides');
-    await addDoc(colRef, rideObject);
+    // Save via rides module helper
+    await saveRide(rideToSave);
 
-    // clear form fields
+    // Clear form
     titleEl.value = '';
     dateEl.value = '';
-    latEl.value = '';
-    lngEl.value = '';
+    document.getElementById('startLocationInput').value = '';
+    document.getElementById('endLocationInput').value = '';
+
+    // Hide map preview
+    const preview = document.getElementById('mapPreviewContainer');
+    if (preview) preview.classList.add('hidden');
 
     showInlineMessage('Ride hosted successfully — visible to all users in Discover.', { type: 'success', targetId: 'hostRideBtn' });
-
-    // Refresh Discover immediately so ride appears for current user
-    await loadRides();
 
   } catch (err) {
     console.error('hostRide error:', err);
@@ -276,9 +304,9 @@ function setup() {
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { loadRides(); });
+    document.addEventListener('DOMContentLoaded', () => { loadRides(); initializeMaps(); });
   } else {
-    loadRides();
+    loadRides(); initializeMaps();
   }
 }
 

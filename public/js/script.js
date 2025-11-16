@@ -2,6 +2,12 @@
 // REVMATE - JAVASCRIPT (PHASES 1-5)
 // ============================================
 
+// Import PWA install functionality
+import { initInstallPrompt, triggerInstall, updateProfileInstallButton } from './pwa-install.js';
+
+// Import hybrid Google Sign-In (popup + redirect fallback)
+import { googleLogin, handleAuthRedirect } from './auth-google.js';
+
 import {
     registerUser,
     loginUser,
@@ -41,6 +47,8 @@ import {
     showRideNotification,
     stopAllListeners
 } from './rides.js';
+import { renderDiscoverRides } from './rides.js';
+import { haversineDistanceKm } from './utils/distance.js';
 
 // Host ride module (wires host button + load/refresh)
 import './host-ride.js';
@@ -397,8 +405,49 @@ function formatDate(dateString) {
 // ============================================
 
 async function loadDiscoverRides() {
-    // Start real-time listener for public rides
-    startDiscoverListener();
+    // Start real-time listener for public rides with radius filtering
+    let userLocation = null;
+    const radiusSelect = document.getElementById('radiusSelect');
+    let cachedRides = [];
+
+    const tryGetLocation = () => new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition((pos) => {
+            resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        }, () => resolve(null), { maximumAge: 60000, timeout: 5000 });
+    });
+
+    userLocation = await tryGetLocation();
+
+    function filterAndRender(rides) {
+        if (!userLocation) {
+            renderDiscoverRides(rides);
+            return;
+        }
+
+        const radiusKm = Number(radiusSelect?.value || 25);
+        const filtered = rides.filter(r => {
+            const sl = r.startLocation || {};
+            const lat = sl.lat ?? sl.latitude ?? null;
+            const lng = sl.lng ?? sl.longitude ?? null;
+            if (lat == null || lng == null) return false;
+            const d = haversineDistanceKm(userLocation.lat, userLocation.lng, Number(lat), Number(lng));
+            return d <= radiusKm;
+        });
+
+        renderDiscoverRides(filtered);
+    }
+
+    // Re-run filter when radius changes
+    if (radiusSelect) {
+        radiusSelect.addEventListener('change', () => { filterAndRender(cachedRides); });
+    }
+
+    // Start listener with callback to receive all rides and then filter
+    startDiscoverListener((rides) => {
+        cachedRides = rides;
+        filterAndRender(rides);
+    });
 }
 
 /**
@@ -771,14 +820,20 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 // ============================================
 
 document.addEventListener('click', async (e) => {
-    // Google login button
+    // Google login button - use hybrid popup/redirect flow
     if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')) {
         console.log('🔐 Google Login clicked');
         e.preventDefault();
         e.stopPropagation();
         
+        const btn = e.target.closest('button[id="login-google"]') || document.getElementById('login-google');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-google"></i> Signing in...'; 
+        }
+        
         try {
-            const result = await loginWithGoogle();
+            const result = await googleLogin();
             console.log('Google login result:', result);
             
             if (result.success) {
@@ -786,24 +841,41 @@ document.addEventListener('click', async (e) => {
                 setTimeout(() => {
                     redirectToApp();
                 }, 800);
+            } else if (result.redirecting) {
+                // Redirect flow initiated - will return to app
+                showAlert('Redirecting to sign-in...', 'info');
             } else {
-                showAlert(result.error, 'danger');
+                showAlert(result.error || 'Sign-in failed', 'danger');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-google"></i> Google';
+                }
             }
         } catch (err) {
             console.error('Google login error:', err);
             showAlert('Error: ' + err.message, 'danger');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-google"></i> Google';
+            }
         }
         return;
     }
     
-    // Google signup button
+    // Google signup button - use hybrid popup/redirect flow
     if (e.target.closest('#signup-google') || e.target.id === 'signup-google' || e.target.closest('button[id="signup-google"]')) {
         console.log('🔐 Google Signup clicked');
         e.preventDefault();
         e.stopPropagation();
         
+        const btn = e.target.closest('button[id="signup-google"]') || document.getElementById('signup-google');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-google"></i> Signing up...'; 
+        }
+        
         try {
-            const result = await loginWithGoogle();
+            const result = await googleLogin();
             console.log('Google signup result:', result);
             
             if (result.success) {
@@ -811,12 +883,23 @@ document.addEventListener('click', async (e) => {
                 setTimeout(() => {
                     redirectToApp();
                 }, 800);
+            } else if (result.redirecting) {
+                // Redirect flow initiated - will return to app
+                showAlert('Redirecting to sign-up...', 'info');
             } else {
-                showAlert(result.error, 'danger');
+                showAlert(result.error || 'Sign-up failed', 'danger');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-google"></i> Google';
+                }
             }
         } catch (err) {
             console.error('Google signup error:', err);
             showAlert('Error: ' + err.message, 'danger');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-google"></i> Google';
+            }
         }
         return;
     }
@@ -1003,6 +1086,14 @@ function redirectToApp() {
 // ============================================
 
 function showSection(sectionId) {
+    // Update install button visibility when profile section is shown
+    if (sectionId === 'profile') {
+        console.log('[PWA] Profile section opened - updating install button');
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            updateProfileInstallButton();
+        }, 100);
+    }
     const allSections = document.querySelectorAll('.app-section');
     allSections.forEach(section => {
         section.classList.remove('active');
@@ -1108,7 +1199,15 @@ function initApp() {
     applySavedTheme();
     
     // Process OAuth redirect result (WebView Google Sign-In)
-    processAuthRedirect().catch(err => {
+    handleAuthRedirect().then(result => {
+        if (result && result.success && result.user) {
+            console.log('✅ Redirect auth completed:', result.user.email);
+            showAlert('Welcome back!', 'success');
+            setTimeout(() => {
+                redirectToApp();
+            }, 800);
+        }
+    }).catch(err => {
         console.error('Error processing auth redirect:', err);
     });
     
@@ -1135,6 +1234,61 @@ function initApp() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    // Initialize Install App button in profile section
+    const installAppBtn = document.getElementById('installAppBtn');
+    if (installAppBtn) {
+        console.log('[PWA] Install button found, attaching click handler');
+        
+        installAppBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('[PWA] ✅ Install button clicked!');
+            
+            // Add visual feedback
+            installAppBtn.disabled = true;
+            installAppBtn.style.opacity = '0.7';
+            const originalText = installAppBtn.innerHTML;
+            installAppBtn.innerHTML = '<span>Processing...</span>';
+            
+            try {
+                const success = await triggerInstall();
+                
+                if (success) {
+                    console.log('[PWA] ✅ Install successful');
+                } else {
+                    console.log('[PWA] ⚠️ Install cancelled or not available');
+                }
+            } catch (error) {
+                console.error('[PWA] ❌ Error in install handler:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                // Restore button state
+                installAppBtn.disabled = false;
+                installAppBtn.style.opacity = '1';
+                installAppBtn.innerHTML = originalText;
+                
+                // Update button visibility
+                updateProfileInstallButton();
+            }
+        });
+        
+        // Also try attaching via onclick as backup
+        installAppBtn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('[PWA] Install button clicked (onclick handler)');
+            await triggerInstall();
+        };
+        
+        console.log('[PWA] Install button handlers attached');
+        
+        // Update install button visibility initially
+        updateProfileInstallButton();
+    } else {
+        console.error('[PWA] ❌ Install button not found!');
     }
     
     // Monitor Firebase authentication state
@@ -1191,7 +1345,11 @@ if (switchLink) {
 }
 
 // Apply theme on load
-window.addEventListener('load', applySavedTheme);
+window.addEventListener('load', () => {
+    applySavedTheme();
+    // Initialize PWA install prompt
+    initInstallPrompt();
+});
 
 // Run initialization
 initApp();

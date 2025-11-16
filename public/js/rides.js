@@ -7,6 +7,8 @@ import { db } from './firebase-config.js';
 import { getCurrentUserId } from './firebase-auth.js';
 import {
   collection,
+  addDoc,
+  serverTimestamp,
   query,
   where,
   orderBy,
@@ -15,7 +17,8 @@ import {
   doc,
   arrayUnion,
   arrayRemove,
-  getDoc
+  getDoc,
+  deleteDoc
 } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 
 // ============================================
@@ -133,13 +136,13 @@ export function startDiscoverListener(callback) {
 
     discoverUnsubscribe = onSnapshot(q, (snapshot) => {
       const rides = snapshot.docs.map(doc => transformRideDoc(doc));
-      
       if (onDiscoverRidesChange) {
+        // If a callback was provided, call it and do NOT auto-render here.
         onDiscoverRidesChange(rides);
+      } else {
+        // No callback supplied — render all rides into the DOM.
+        renderDiscoverRides(rides);
       }
-      
-      // Also render immediately if DOM container exists
-      renderDiscoverRides(rides);
     }, (error) => {
       console.error('❌ Discover listener error:', error);
     });
@@ -236,6 +239,26 @@ export function renderDiscoverRides(rides = []) {
 
   // Attach event listeners to buttons
   attachDiscoverButtonListeners(container);
+}
+
+// Save new ride to Firestore with the expected structure
+export async function saveRide(rideData = {}) {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+
+    const colRef = collection(db, 'rides');
+
+    // rideData.rideDateTime expected to be a JS Date object per requirements
+    const payload = Object.assign({}, rideData, {
+      createdAt: serverTimestamp()
+    });
+
+    const res = await addDoc(colRef, payload);
+    return { success: true, id: res.id };
+  } catch (err) {
+    console.error('saveRide error', err);
+    return { success: false, error: err.message };
+  }
 }
 
 /**
@@ -645,7 +668,7 @@ export async function deleteRide(rideId) {
     }
 
     // Delete the ride
-    await deleteRide(rideRef);
+    await deleteDoc(rideRef);
     showRideNotification('Ride deleted successfully!', 'success');
     console.log('✅ Deleted ride:', rideId);
   } catch (error) {

@@ -151,6 +151,11 @@ export async function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         const webview = isWebView();
         
+        // Check if running in PWA standalone mode
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                      window.navigator.standalone === true ||
+                      document.referrer.includes('android-app://');
+        
         // Configure provider for maximum compatibility
         provider.addScope('email');
         provider.addScope('profile');
@@ -159,13 +164,18 @@ export async function loginWithGoogle() {
             'access_type': 'offline'
         });
         
-        logWebViewDebug('GOOGLE_LOGIN_START', { isWebView: webview });
+        logWebViewDebug('GOOGLE_LOGIN_START', { isWebView: webview, isPWA });
         
         let result;
         
-        if (webview) {
-            // WebView: Use redirect flow (opens external browser)
-            console.log('📱 WebView detected - using redirect flow');
+        // Use redirect for PWA standalone mode or WebView
+        if (isPWA || webview) {
+            // PWA or WebView: Use redirect flow
+            if (isPWA) {
+                console.log('📱 PWA standalone mode detected - using redirect flow');
+            } else {
+                console.log('📱 WebView detected - using redirect flow');
+            }
             logWebViewDebug('REDIRECT_FLOW_INITIATED', { 
                 method: 'signInWithRedirect',
                 scopes: ['email', 'profile']
@@ -310,9 +320,30 @@ export async function loginWithApple() {
         provider.addScope('email');
         provider.addScope('name');
         
-        logWebViewDebug('APPLE_LOGIN_START', {});
+        // Check if running in PWA standalone mode
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                      window.navigator.standalone === true ||
+                      document.referrer.includes('android-app://');
+        const webview = isWebView();
+        
+        logWebViewDebug('APPLE_LOGIN_START', { isPWA, isWebView: webview });
         
         let result;
+        
+        // Use redirect for PWA standalone mode or WebView
+        if (isPWA || webview) {
+            if (isPWA) {
+                console.log('📱 PWA standalone mode detected - using redirect flow for Apple');
+            } else {
+                console.log('📱 WebView detected - using redirect flow for Apple');
+            }
+            await signInWithRedirect(auth, provider);
+            return {
+                success: true,
+                message: 'Redirecting to Apple Sign-In...'
+            };
+        }
+        
         try {
             result = await signInWithPopup(auth, provider);
         } catch (popupError) {

@@ -1,40 +1,11 @@
 // ============================================
-// FIREBASE CONFIGURATION (ES Module, CDN v12.6.0)
+// FIREBASE CONFIGURATION (BACKWARD COMPATIBILITY)
 // ============================================
+// NOTE: For new modules, import from firebase-init.js instead
+// This file now re-exports from the centralized firebase-init.js
+// to ensure all modules use the same Firebase app instance
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDEDcuCkGe7N6H6A8kX4BljtMdjR9IoXis",
-  authDomain: "avishkar-c9826.firebaseapp.com",
-  projectId: "avishkar-c9826",
-  storageBucket: "avishkar-c9826.firebasestorage.app",
-  messagingSenderId: "480658299095",
-  appId: "1:480658299095:web:1d1cda6f2f36713738b892",
-  measurementId: "G-Z565TNDFD1"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// Enable Auth Session Persistence
-setPersistence(auth, browserLocalPersistence).catch(err => {
-  console.warn('⚠️ Persistence warning:', err.code);
-});
-
-// Expose db on window for modules that expect window.db
-if (typeof window !== 'undefined') {
-  window.db = db;
-  window.firebaseAuth = auth;
-}
+import { app, auth, db, storage, analytics } from './firebase-init.js';
 
 export { app, analytics, auth, db, storage };
+

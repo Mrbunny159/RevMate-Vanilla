@@ -1,0 +1,630 @@
+/* ============================================
+   REVMATE PWA THEME ENHANCEMENTS
+   Improved UI theme, accent colors, and PWA styling
+   ============================================ */
+
+/* ============================================
+   PWA INSTALL BUTTON STYLES
+   ============================================ */
+
+.pwa-install-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 15px auto;
+  box-shadow: 0 4px 12px rgba(205, 180, 219, 0.3);
+  position: relative;
+  z-index: 100;
+}
+
+/* Profile Section Install Button */
+#installContainer {
+  animation: fadeInUp 0.4s ease;
+}
+
+.install-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.btn-install {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border: none;
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(205, 180, 219, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-install::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-install:hover::before {
+  left: 100%;
+}
+
+.btn-install:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(205, 180, 219, 0.5);
+}
+
+.btn-install:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(205, 180, 219, 0.35);
+}
+
+.btn-install:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.install-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.btn-install span:not(.install-icon) {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.ios-install-hint {
+  background: #f8f9fa;
+  border-left: 4px solid var(--accent);
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.ios-install-hint small {
+  color: #555;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  display: block;
+}
+
+.install-hint {
+  display: block;
+  text-align: center;
+  color: #999;
+  font-size: 0.8rem;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+.install-status {
+  margin-top: 12px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.install-status.installed {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.install-status.ios-info {
+  background: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+.install-status.waiting {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.install-status small {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: block;
+}
+
+/* User Message Popup */
+.install-user-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.install-user-message-success {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  border: 2px solid #28a745;
+  color: #155724;
+}
+
+.install-user-message-info {
+  background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+  border: 2px solid #17a2b8;
+  color: #0c5460;
+}
+
+.install-user-message-warning {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 2px solid #ffc107;
+  color: #856404;
+}
+
+.install-user-message-error {
+  background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+  border: 2px solid #dc3545;
+  color: #721c24;
+}
+
+.install-message-content {
+  text-align: left;
+}
+
+.install-message-content strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.install-message-content p {
+  margin: 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.install-message-close {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.install-message-close:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.pwa-install-btn.show {
+  display: flex;
+}
+
+.pwa-install-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(205, 180, 219, 0.4);
+}
+
+.pwa-install-btn:active {
+  transform: translateY(0);
+}
+
+.pwa-install-btn i {
+  font-size: 1.1rem;
+}
+
+/* iOS Install Instructions Modal */
+.pwa-instructions-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.pwa-ios-instructions {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.pwa-ios-instructions h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-dark);
+  text-align: center;
+}
+
+.pwa-ios-instructions ol {
+  text-align: left;
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+
+.pwa-ios-instructions li {
+  margin-bottom: 12px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.pwa-ios-instructions button {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pwa-ios-instructions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(205, 180, 219, 0.4);
+}
+
+/* Install Success Message */
+.pwa-install-success {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  background: linear-gradient(135deg, #27AE60, #1E8449);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  animation: slideInUp 0.3s ease;
+}
+
+.pwa-install-success i {
+  font-size: 1.5rem;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   ENHANCED THEME COLORS & CSS VARIABLES
+   ============================================ */
+
+:root {
+  /* Enhanced accent colors for better contrast */
+  --accent-bright: #CDB4DB;
+  --accent-dark: #9B7EBD;
+  --primary-bright: #A8DADC;
+  --primary-dark: #89C5C8;
+  
+  /* Button accent colors */
+  --btn-accent: var(--accent);
+  --btn-accent-hover: var(--accent-dark);
+  --btn-primary: var(--primary);
+  --btn-primary-hover: var(--primary-dark);
+  
+  /* Typography improvements */
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  
+  /* Enhanced shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-accent: 0 4px 15px rgba(205, 180, 219, 0.3);
+}
+
+/* ============================================
+   ENHANCED BUTTON STYLES
+   ============================================ */
+
+.btn-primary,
+.btn-host,
+.btn-join,
+.btn-save {
+  background: linear-gradient(135deg, var(--btn-accent), var(--accent-dark));
+  border: none;
+  color: white;
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-accent);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-host:hover,
+.btn-join:hover,
+.btn-save:hover {
+  background: linear-gradient(135deg, var(--btn-accent-hover), var(--accent-dark));
+  box-shadow: 0 6px 20px rgba(205, 180, 219, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active,
+.btn-host:active,
+.btn-join:active,
+.btn-save:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   ENHANCED TYPOGRAPHY
+   ============================================ */
+
+.section-header h2,
+.welcome-title {
+  font-weight: var(--font-weight-bold);
+  font-size: 1.8rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.section-header p,
+.welcome-subtitle {
+  font-weight: var(--font-weight-medium);
+  font-size: 1rem;
+}
+
+.action-card h3,
+.ride-card-title,
+.my-ride-card-title {
+  font-weight: var(--font-weight-semibold);
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+
+/* ============================================
+   ENHANCED RIDE CARDS
+   ============================================ */
+
+.ride-card,
+.my-ride-card {
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  border: 1.5px solid rgba(205, 180, 219, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.ride-card:hover,
+.my-ride-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+.ride-card-header,
+.ride-card-body {
+  padding: 0;
+}
+
+.ride-card-footer {
+  border-top: 1px solid rgba(205, 180, 219, 0.15);
+  padding-top: 15px;
+  margin-top: 15px;
+}
+
+/* Enhanced ride card title */
+.ride-title {
+  font-weight: var(--font-weight-bold);
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+/* Enhanced badge */
+.badge-public {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  font-weight: var(--font-weight-semibold);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 8px rgba(205, 180, 219, 0.3);
+}
+
+/* ============================================
+   ENHANCED ACTION CARDS
+   ============================================ */
+
+.action-card {
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(205, 180, 219, 0.15);
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+/* ============================================
+   ENHANCED FORM ELEMENTS
+   ============================================ */
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(205, 180, 219, 0.25);
+}
+
+/* ============================================
+   ENHANCED NAVIGATION
+   ============================================ */
+
+.bottom-nav {
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(205, 180, 219, 0.2);
+}
+
+.nav-item.active {
+  color: var(--accent);
+}
+
+.nav-item.active i {
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   PWA STANDALONE MODE ADJUSTMENTS
+   ============================================ */
+
+@media (display-mode: standalone) {
+  /* Add safe area padding for iOS notch */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .bottom-nav {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  
+  /* Adjust for status bar */
+  .section-header {
+    padding-top: calc(20px + env(safe-area-inset-top));
+  }
+}
+
+/* ============================================
+   IMPROVED CONTRAST & READABILITY
+   ============================================ */
+
+.ride-card-desc,
+.ride-value,
+.detail-value {
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+.ride-label {
+  color: #666;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+/* ============================================
+   ENHANCED ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ride-card,
+.my-ride-card,
+.action-card {
+  animation: fadeInUp 0.4s ease;
+}
+
+/* ============================================
+   RESPONSIVE IMPROVEMENTS
+   ============================================ */
+
+@media (max-width: 480px) {
+  .pwa-install-btn {
+    font-size: 0.85rem;
+    padding: 10px 16px;
+  }
+  
+  .section-header h2,
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================
+   DARK MODE ENHANCEMENTS
+   ============================================ */
+
+.dark-mode .pwa-install-btn {
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+}
+
+.dark-mode .ride-card,
+.dark-mode .my-ride-card {
+  border-color: rgba(205, 180, 219, 0.3);
+}
+
+.dark-mode .ride-card:hover,
+.dark-mode .my-ride-card:hover {
+  border-color: var(--accent);
+}
+

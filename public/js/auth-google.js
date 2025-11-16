@@ -142,10 +142,16 @@ export async function googleLogin() {
     const isWebView = isEmbeddedWebView();
     const canOpenExternal = canOpenExternalBrowser();
     
+    // Check if running in PWA standalone mode
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                  window.navigator.standalone === true ||
+                  document.referrer.includes('android-app://');
+    
     console.log('🔐 Google Login:', {
       isWebView,
       wrapperType: getWrapperType(),
-      canOpenExternal
+      canOpenExternal,
+      isPWA
     });
 
     let result;
@@ -154,11 +160,16 @@ export async function googleLogin() {
     // DECISION: POPUP vs REDIRECT
     // =====================================
     
-    if (isWebView && canOpenExternal) {
-      // WebView detected: Use redirect flow (opens external browser)
-      console.log('📱 WebView detected - using redirect flow');
+    // Use redirect for PWA standalone mode or WebView
+    if (isPWA || (isWebView && canOpenExternal)) {
+      // PWA or WebView detected: Use redirect flow
+      if (isPWA) {
+        console.log('📱 PWA standalone mode detected - using redirect flow');
+      } else {
+        console.log('📱 WebView detected - using redirect flow');
+      }
       logEnvironmentDetection('GOOGLE_LOGIN_REDIRECT_FLOW', {
-        reason: 'WebView detected'
+        reason: isPWA ? 'PWA standalone mode' : 'WebView detected'
       });
 
       try {
