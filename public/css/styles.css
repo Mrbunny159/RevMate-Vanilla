@@ -2,7 +2,11 @@
    REVMATE - STYLES (PHASE 1-5)
    ============================================ */
 
-/* CSS Variables - Pastel Theme */
+/* ============================================
+   THEME COLOR SYSTEM
+   ============================================ */
+
+/* Default Theme - Mint Dream (Pastel) */
 :root {
     --primary: #A8DADC;
     --secondary: #FEC8D8;
@@ -11,6 +15,116 @@
     --text-dark: #333;
     --success: #B8E0D2;
     transition: all 0.3s ease-in-out;
+}
+
+/* ============================================
+   PASTEL COLOR THEMES
+   ============================================ */
+
+/* Mint Dream Theme */
+:root.theme-mint {
+    --primary: #A8DADC;
+    --secondary: #F8E8E8;
+    --accent: #CDB4DB;
+}
+
+/* Blush Rose Theme */
+:root.theme-blush {
+    --primary: #FEC8D8;
+    --secondary: #E8D5E8;
+    --accent: #FF6B9D;
+}
+
+/* Lavender Theme */
+:root.theme-lavender {
+    --primary: #CDB4DB;
+    --secondary: #E8D5F8;
+    --accent: #9B7EBD;
+}
+
+/* Seafoam Theme */
+:root.theme-seafoam {
+    --primary: #B8E0D2;
+    --secondary: #D8F0E8;
+    --accent: #76C9A1;
+}
+
+/* Peach Theme */
+:root.theme-peach {
+    --primary: #FFCDB2;
+    --secondary: #FFE5D9;
+    --accent: #FF9D71;
+}
+
+/* ============================================
+   VIBRANT COLOR THEMES
+   ============================================ */
+
+/* Ocean Blue Theme */
+:root.theme-ocean {
+    --primary: #0E7C86;
+    --secondary: #8DD3C7;
+    --accent: #006D7D;
+}
+
+/* Sunset Orange Theme */
+:root.theme-sunset {
+    --primary: #FF6B35;
+    --secondary: #F5B461;
+    --accent: #D62828;
+}
+
+/* Forest Green Theme */
+:root.theme-forest {
+    --primary: #2D6A4F;
+    --secondary: #52B788;
+    --accent: #1B4332;
+}
+
+/* Coral Pink Theme */
+:root.theme-coral {
+    --primary: #FF6B6B;
+    --secondary: #FFD66B;
+    --accent: #FF5252;
+}
+
+/* Deep Violet Theme */
+:root.theme-violet {
+    --primary: #8B5A8E;
+    --secondary: #DDB4DB;
+    --accent: #6A4C70;
+}
+
+/* ============================================
+   MODERN COLOR THEMES
+   ============================================ */
+
+/* Teal Modern Theme */
+:root.theme-teal {
+    --primary: #20B2AA;
+    --secondary: #48D1CC;
+    --accent: #008B8B;
+}
+
+/* Rose Gold Theme */
+:root.theme-rose {
+    --primary: #B76E79;
+    --secondary: #FDBCB4;
+    --accent: #9D4E6C;
+}
+
+/* Amber Theme */
+:root.theme-amber {
+    --primary: #FFA500;
+    --secondary: #FFD700;
+    --accent: #FF8C00;
+}
+
+/* Cyan Theme */
+:root.theme-cyan {
+    --primary: #00CED1;
+    --secondary: #E0FFFF;
+    --accent: #00BFFF;
 }
 
 /* Dark Mode Variables */
@@ -539,6 +653,41 @@ body {
 
 .form-select:focus {
     border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
+}
+
+/* Theme Preview Box */
+.theme-preview {
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.preview-box {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.preview-box::before,
+.preview-box::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.preview-box::before {
+    background: var(--primary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.preview-box::after {
+    background: var(--accent);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
     box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
 }
 

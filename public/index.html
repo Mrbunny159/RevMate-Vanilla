@@ -14,8 +14,9 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-  <!-- External Stylesheet -->
+  <!-- External Stylesheets -->
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/rides.css">
 
   <!-- Firebase SDK and app initialization are imported as ES modules from CDN
      (modules are imported by `script.js` using relative module imports) -->
@@ -319,13 +320,35 @@
           <div class="profile-card">
             <h6>Theme Customization</h6>
             <div class="mb-3">
-              <label for="themeSelect" class="form-label">Accent Color</label>
+              <label for="themeSelect" class="form-label">Theme Color</label>
               <select id="themeSelect" class="form-select">
-                <option value="#A8DADC">Mint</option>
-                <option value="#FEC8D8">Blush</option>
-                <option value="#CDB4DB">Lavender</option>
-                <option value="#B8E0D2">Seafoam</option>
+                <!-- Pastel Themes -->
+                <optgroup label="Pastel Colors">
+                  <option value="mint">🌿 Mint Dream</option>
+                  <option value="blush">🌸 Blush Rose</option>
+                  <option value="lavender">💜 Lavender</option>
+                  <option value="seafoam">🌊 Seafoam</option>
+                  <option value="peach">🍑 Peach</option>
+                </optgroup>
+                <!-- Vibrant Themes -->
+                <optgroup label="Vibrant Colors">
+                  <option value="ocean">🌀 Ocean Blue</option>
+                  <option value="sunset">🌅 Sunset Orange</option>
+                  <option value="forest">🌲 Forest Green</option>
+                  <option value="coral">🪸 Coral Pink</option>
+                  <option value="violet">✨ Deep Violet</option>
+                </optgroup>
+                <!-- Modern Themes -->
+                <optgroup label="Modern Colors">
+                  <option value="teal">Teal Modern</option>
+                  <option value="rose">Rose Gold</option>
+                  <option value="amber">Amber</option>
+                  <option value="cyan">Cyan</option>
+                </optgroup>
               </select>
+            </div>
+            <div class="theme-preview mb-3">
+              <div class="preview-box" id="themePreview"></div>
             </div>
             <div class="form-check form-switch mb-3">
               <input class="form-check-input" type="checkbox" id="darkModeToggle">

@@ -4,7 +4,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
@@ -26,28 +26,15 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// Configure Auth for WebView compatibility
-// This ensures session persistence works correctly in WebView environments
-auth.setPersistence = undefined; // Reset to default (LOCAL persistence)
-if (typeof auth.settings !== 'undefined') {
-  auth.settings.appVerificationDisabledForTesting = false;
-}
-
-// CRITICAL FIX: Ensure auth domain matches
-// This prevents "invalid authDomain" errors
-auth.tenantId = null; // Single tenant app
-
 // Enable Auth Session Persistence
-import { setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 setPersistence(auth, browserLocalPersistence).catch(err => {
-  console.warn('⚠️ Persistence setup warning:', err.code);
+  console.warn('⚠️ Persistence warning:', err.code);
 });
 
-// Export Firebase services for use in other modules
-// expose db on window for modules that expect window.db
+// Expose db on window for modules that expect window.db
 if (typeof window !== 'undefined') {
   window.db = db;
-  window.firebaseAuth = auth; // Expose for debugging
+  window.firebaseAuth = auth;
 }
 
 export { app, analytics, auth, db, storage };

@@ -21,19 +21,26 @@ import {
     getAllRides,
     getHostedRides,
     getJoinedRides,
-    joinRide as firebaseJoinRide,
-    leaveRide,
-    deleteRide as firebaseDeleteRide,
     getCommunityMembers,
     followMember as firebaseFollowMember,
     unfollowMember,
     updateUserProfile
 } from './firebase-db.js';
 
+// NEW: Import the consolidated rides module with real-time listeners
 import {
-    initializeDiscoverRides,
-    refreshDiscoverRides
-} from './discover-rides.js';
+    startDiscoverListener,
+    stopDiscoverListener,
+    startHostedListener,
+    stopHostedListener,
+    startJoinedListener,
+    stopJoinedListener,
+    joinRide,
+    leaveRide,
+    deleteRide,
+    showRideNotification,
+    stopAllListeners
+} from './rides.js';
 
 // Host ride module (wires host button + load/refresh)
 import './host-ride.js';
@@ -90,37 +97,169 @@ function showRideAlert(message) {
 // THEME MANAGEMENT (PHASE 5)
 // ============================================
 
+// Theme color palette system
+const THEME_COLORS = {
+    // Pastel Themes
+    mint: {
+        name: '🌿 Mint Dream',
+        category: 'Pastel',
+        primary: '#A8DADC',
+        secondary: '#F8E8E8',
+        accent: '#CDB4DB'
+    },
+    blush: {
+        name: '🌸 Blush Rose',
+        category: 'Pastel',
+        primary: '#FEC8D8',
+        secondary: '#E8D5E8',
+        accent: '#FF6B9D'
+    },
+    lavender: {
+        name: '💜 Lavender',
+        category: 'Pastel',
+        primary: '#CDB4DB',
+        secondary: '#E8D5F8',
+        accent: '#9B7EBD'
+    },
+    seafoam: {
+        name: '🌊 Seafoam',
+        category: 'Pastel',
+        primary: '#B8E0D2',
+        secondary: '#D8F0E8',
+        accent: '#76C9A1'
+    },
+    peach: {
+        name: '🍑 Peach',
+        category: 'Pastel',
+        primary: '#FFCDB2',
+        secondary: '#FFE5D9',
+        accent: '#FF9D71'
+    },
+    // Vibrant Themes
+    ocean: {
+        name: '🌀 Ocean Blue',
+        category: 'Vibrant',
+        primary: '#0E7C86',
+        secondary: '#8DD3C7',
+        accent: '#006D7D'
+    },
+    sunset: {
+        name: '🌅 Sunset Orange',
+        category: 'Vibrant',
+        primary: '#FF6B35',
+        secondary: '#F5B461',
+        accent: '#D62828'
+    },
+    forest: {
+        name: '🌲 Forest Green',
+        category: 'Vibrant',
+        primary: '#2D6A4F',
+        secondary: '#52B788',
+        accent: '#1B4332'
+    },
+    coral: {
+        name: '🪸 Coral Pink',
+        category: 'Vibrant',
+        primary: '#FF6B6B',
+        secondary: '#FFD66B',
+        accent: '#FF5252'
+    },
+    violet: {
+        name: '✨ Deep Violet',
+        category: 'Vibrant',
+        primary: '#8B5A8E',
+        secondary: '#DDB4DB',
+        accent: '#6A4C70'
+    },
+    // Modern Themes
+    teal: {
+        name: 'Teal Modern',
+        category: 'Modern',
+        primary: '#20B2AA',
+        secondary: '#48D1CC',
+        accent: '#008B8B'
+    },
+    rose: {
+        name: 'Rose Gold',
+        category: 'Modern',
+        primary: '#B76E79',
+        secondary: '#FDBCB4',
+        accent: '#9D4E6C'
+    },
+    amber: {
+        name: 'Amber',
+        category: 'Modern',
+        primary: '#FFA500',
+        secondary: '#FFD700',
+        accent: '#FF8C00'
+    },
+    cyan: {
+        name: 'Cyan',
+        category: 'Modern',
+        primary: '#00CED1',
+        secondary: '#E0FFFF',
+        accent: '#00BFFF'
+    }
+};
+
+function applyTheme(themeName) {
+    const theme = THEME_COLORS[themeName] || THEME_COLORS.mint;
+    
+    // Apply theme class to root
+    document.documentElement.classList.remove(
+        ...Object.keys(THEME_COLORS).map(t => `theme-${t}`)
+    );
+    document.documentElement.classList.add(`theme-${themeName}`);
+    
+    // Apply CSS variables for immediate effect
+    document.documentElement.style.setProperty('--primary', theme.primary);
+    document.documentElement.style.setProperty('--secondary', theme.secondary);
+    document.documentElement.style.setProperty('--accent', theme.accent);
+    
+    // Update preview
+    updateThemePreview(theme);
+}
+
+function updateThemePreview(theme) {
+    const preview = document.getElementById('themePreview');
+    if (preview) {
+        preview.style.setProperty('--primary', theme.primary);
+        preview.style.setProperty('--accent', theme.accent);
+    }
+}
+
 function applySavedTheme() {
     const themeSettings = getData('themeSettings');
     
-    if (themeSettings) {
-        // Apply accent color
-        if (themeSettings.accent) {
-            document.documentElement.style.setProperty('--accent', themeSettings.accent);
-        }
-        
-        // Apply dark mode
-        if (themeSettings.darkMode) {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-        }
+    if (themeSettings && themeSettings.theme) {
+        // Apply selected theme
+        applyTheme(themeSettings.theme);
+    } else {
+        // Apply default theme
+        applyTheme('mint');
+    }
+    
+    // Apply dark mode
+    if (themeSettings && themeSettings.darkMode) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
     }
 }
 
 function saveThemeSettings() {
-    const accent = document.getElementById('themeSelect').value;
+    const themeName = document.getElementById('themeSelect').value;
     const darkMode = document.getElementById('darkModeToggle').checked;
     
     const themeSettings = {
-        accent: accent,
+        theme: themeName,
         darkMode: darkMode
     };
     
     saveData('themeSettings', themeSettings);
     
     // Apply immediately
-    document.documentElement.style.setProperty('--accent', accent);
+    applyTheme(themeName);
     
     if (darkMode) {
         document.body.classList.add('dark-mode');
@@ -128,7 +267,7 @@ function saveThemeSettings() {
         document.body.classList.remove('dark-mode');
     }
     
-    showRideAlert('Theme saved successfully!');
+    showRideAlert('✨ Theme saved successfully!');
 }
 
 function loadProfileData() {
@@ -142,8 +281,14 @@ function loadProfileData() {
     // Load theme settings
     const themeSettings = getData('themeSettings');
     if (themeSettings) {
-        document.getElementById('themeSelect').value = themeSettings.accent || '#A8DADC';
+        document.getElementById('themeSelect').value = themeSettings.theme || 'mint';
         document.getElementById('darkModeToggle').checked = themeSettings.darkMode || false;
+        // Update preview
+        const selectedTheme = THEME_COLORS[themeSettings.theme] || THEME_COLORS.mint;
+        updateThemePreview(selectedTheme);
+    } else {
+        // Set default preview
+        updateThemePreview(THEME_COLORS.mint);
     }
 }
 
@@ -248,16 +393,21 @@ function formatDate(dateString) {
 }
 
 // ============================================
-// DISCOVER RIDES (Firestore Integration)
+// DISCOVER RIDES (Real-time Firestore Integration)
 // ============================================
 
 async function loadDiscoverRides() {
-    await initializeDiscoverRides();
+    // Start real-time listener for public rides
+    startDiscoverListener();
 }
 
-// ============================================
-// HOST RIDE
-// ============================================
+/**
+ * Refresh discover rides when returning to tab
+ */
+async function refreshDiscoverRides() {
+    // Already listening in real-time, no need to refresh
+    console.log('ℹ️ Discover rides are syncing in real-time');
+}
 
 function initHostRideForm() {
     const hostForm = document.getElementById('hostRideForm');
@@ -311,119 +461,48 @@ function initHostRideForm() {
 }
 
 // ============================================
-// MY RIDES
+// MY RIDES - Real-Time Sync (Hosted & Joined)
 // ============================================
 
 let currentRideTab = 'hosted';
 
 function renderMyRides(type = 'hosted') {
-    const container = document.getElementById('myRidesContainer');
-    if (!container) return;
-    
+    /**
+     * Real-time listeners in rides.js will automatically handle rendering
+     * This function is now just to switch between tabs
+     */
     currentRideTab = type;
-    const rides = getRides();
-    const currentUser = getData('currentUser');
     
-    if (!currentUser) {
-        container.innerHTML = '<div class="empty-rides"><p>Please login to view your rides</p></div>';
-        return;
-    }
-    
-    let filteredRides = [];
-    
+    // Stop old listener
     if (type === 'hosted') {
-        filteredRides = rides.filter(r => r.hostId === currentUser.id);
+        stopJoinedListener();
+        // Start hosted listener (will auto-render)
+        startHostedListener();
     } else {
-        filteredRides = rides.filter(r => r.joinedUsers.includes(currentUser.id));
-    }
-    
-    if (filteredRides.length === 0) {
-        const emptyMessage = type === 'hosted' 
-            ? 'You\'haven\'t hosted any rides yet. Create one from the Host section!'
-            : 'You\'haven\'t joined any rides yet. Explore the Discover section!';
-        
-        container.innerHTML = `
-            <div class="empty-rides">
-                <i class="bi bi-${type === 'hosted' ? 'flag' : 'calendar-x'}"></i>
-                <p>${emptyMessage}</p>
-            </div>
-        `;
-        return;
-    }
-    
-    filteredRides.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    container.innerHTML = filteredRides.map(ride => {
-        const badge = type === 'hosted' 
-            ? '<span class="ride-type-badge"><i class="bi bi-flag-fill"></i> Hosted</span>'
-            : '<span class="ride-type-badge" style="background: linear-gradient(135deg, var(--success), var(--primary));"><i class="bi bi-check-circle-fill"></i> Joined</span>';
-        
-        const deleteBtn = type === 'hosted'
-            ? `<button class="btn-delete" data-ride-id="${ride.id}">
-                <i class="bi bi-trash"></i> Delete
-               </button>`
-            : '';
-        
-        return `
-            <div class="my-ride-card">
-                ${badge}
-                <h3 class="my-ride-card-title">${ride.title}</h3>
-                
-                <div class="my-ride-card-details">
-                    <div class="my-ride-detail">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <span>${ride.start} → ${ride.dest}</span>
-                    </div>
-                    <div class="my-ride-detail">
-                        <i class="bi bi-calendar-event"></i>
-                        <span>${formatDate(ride.date)}</span>
-                    </div>
-                    ${type === 'joined' ? `
-                        <div class="my-ride-detail">
-                            <i class="bi bi-person-circle"></i>
-                            <span>Host: ${ride.host}</span>
-                        </div>
-                    ` : ''}
-                </div>
-                
-                <div class="my-ride-card-footer">
-                    <div class="ride-status">
-                        <i class="bi bi-people-fill"></i>
-                        ${ride.joinedUsers.length} rider${ride.joinedUsers.length !== 1 ? 's' : ''} joined
-                    </div>
-                    ${deleteBtn}
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    if (type === 'hosted') {
-        const deleteButtons = container.querySelectorAll('.btn-delete');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const rideId = parseInt(button.getAttribute('data-ride-id'));
-                deleteRide(rideId);
-            });
-        });
+        stopHostedListener();
+        // Start joined listener (will auto-render)
+        startJoinedListener();
     }
 }
 
-function deleteRide(rideId) {
-    const currentUser = getData('currentUser');
-    if (!currentUser) return;
-    
-    const rides = getRides();
-    const rideIndex = rides.findIndex(r => r.id === rideId && r.hostId === currentUser.id);
-    
-    if (rideIndex === -1) {
-        showRideAlert('Cannot delete this ride');
-        return;
+/**
+ * Delete ride (handled by rides.js module)
+ */
+async function deleteRideHandler(rideId) {
+    const confirmed = confirm('Are you sure you want to delete this ride?');
+    if (confirmed) {
+        await deleteRide(rideId);
     }
-    
-    const deletedRide = rides.splice(rideIndex, 1)[0];
-    saveRides(rides);
-    renderMyRides('hosted');
-    showRideAlert(`"${deletedRide.title}" deleted successfully`);
+}
+
+/**
+ * Leave ride (handled by rides.js module)
+ */
+async function leaveRideHandler(rideId) {
+    const confirmed = confirm('Are you sure you want to leave this ride?');
+    if (confirmed) {
+        await leaveRide(rideId);
+    }
 }
 
 function initMyRidesTabs() {
@@ -688,88 +767,110 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 });
 
 // ============================================
-// GOOGLE LOGIN
+// SOCIAL LOGIN & SIGNUP BUTTONS (Event Delegation)
 // ============================================
 
-const googleLoginBtn = document.getElementById('login-google');
-if (googleLoginBtn) {
-    googleLoginBtn.addEventListener('click', async (e) => {
+document.addEventListener('click', async (e) => {
+    // Google login button
+    if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')) {
+        console.log('🔐 Google Login clicked');
         e.preventDefault();
-        const result = await loginWithGoogle();
+        e.stopPropagation();
         
-        if (result.success) {
-            showAlert('Login successful!', 'success');
-            setTimeout(() => {
-                redirectToApp();
-            }, 800);
-        } else {
-            showAlert(result.error, 'danger');
+        try {
+            const result = await loginWithGoogle();
+            console.log('Google login result:', result);
+            
+            if (result.success) {
+                showAlert('Login successful!', 'success');
+                setTimeout(() => {
+                    redirectToApp();
+                }, 800);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        } catch (err) {
+            console.error('Google login error:', err);
+            showAlert('Error: ' + err.message, 'danger');
         }
-    });
-}
-
-// ============================================
-// APPLE LOGIN
-// ============================================
-
-const appleLoginBtn = document.getElementById('login-apple');
-if (appleLoginBtn) {
-    appleLoginBtn.addEventListener('click', async (e) => {
+        return;
+    }
+    
+    // Google signup button
+    if (e.target.closest('#signup-google') || e.target.id === 'signup-google' || e.target.closest('button[id="signup-google"]')) {
+        console.log('🔐 Google Signup clicked');
         e.preventDefault();
-        const result = await loginWithApple();
+        e.stopPropagation();
         
-        if (result.success) {
-            showAlert('Login successful!', 'success');
-            setTimeout(() => {
-                redirectToApp();
-            }, 800);
-        } else {
-            showAlert(result.error, 'danger');
+        try {
+            const result = await loginWithGoogle();
+            console.log('Google signup result:', result);
+            
+            if (result.success) {
+                showAlert('Account created successfully!', 'success');
+                setTimeout(() => {
+                    redirectToApp();
+                }, 800);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        } catch (err) {
+            console.error('Google signup error:', err);
+            showAlert('Error: ' + err.message, 'danger');
         }
-    });
-}
-
-// ============================================
-// GOOGLE SIGNUP
-// ============================================
-
-const googleSignupBtn = document.getElementById('signup-google');
-if (googleSignupBtn) {
-    googleSignupBtn.addEventListener('click', async (e) => {
+        return;
+    }
+    
+    // Apple login button
+    if (e.target.closest('#login-apple') || e.target.id === 'login-apple' || e.target.closest('button[id="login-apple"]')) {
+        console.log('🔐 Apple Login clicked');
         e.preventDefault();
-        const result = await loginWithGoogle();
+        e.stopPropagation();
         
-        if (result.success) {
-            showAlert('Account created successfully!', 'success');
-            setTimeout(() => {
-                redirectToApp();
-            }, 800);
-        } else {
-            showAlert(result.error, 'danger');
+        try {
+            const result = await loginWithApple();
+            console.log('Apple login result:', result);
+            
+            if (result.success) {
+                showAlert('Login successful!', 'success');
+                setTimeout(() => {
+                    redirectToApp();
+                }, 800);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        } catch (err) {
+            console.error('Apple login error:', err);
+            showAlert('Error: ' + err.message, 'danger');
         }
-    });
-}
-
-// ============================================
-// APPLE SIGNUP
-// ============================================
-
-const appleSignupBtn = document.getElementById('signup-apple');
-if (appleSignupBtn) {
-    appleSignupBtn.addEventListener('click', async (e) => {
+        return;
+    }
+    
+    // Apple signup button
+    if (e.target.closest('#signup-apple') || e.target.id === 'signup-apple' || e.target.closest('button[id="signup-apple"]')) {
+        console.log('🔐 Apple Signup clicked');
         e.preventDefault();
-        const result = await loginWithApple();
+        e.stopPropagation();
         
-        if (result.success) {
-            showAlert('Account created successfully!', 'success');
-            setTimeout(() => {
-                redirectToApp();
-            }, 800);
-        } else {
-            showAlert(result.error, 'danger');
+        try {
+            const result = await loginWithApple();
+            console.log('Apple signup result:', result);
+            
+            if (result.success) {
+                showAlert('Account created successfully!', 'success');
+                setTimeout(() => {
+                    redirectToApp();
+                }, 800);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        } catch (err) {
+            console.error('Apple signup error:', err);
+            showAlert('Error: ' + err.message, 'danger');
         }
-    });
-}
+        return;
+    }
+});
 
 // ============================================
 // PHONE LOGIN - TOGGLE FORMS
@@ -922,10 +1023,18 @@ function showSection(sectionId) {
     
     saveData('lastSection', sectionId);
     
+    // Handle section-specific initialization
     if (sectionId === 'discover') {
-        refreshDiscoverRides();
+        console.log('📍 Loading Discover Rides...');
+        loadDiscoverRides();
     } else if (sectionId === 'myrides') {
-        renderMyRides(currentRideTab);
+        console.log('📍 Loading My Rides...');
+        // Start listeners for my rides tabs
+        if (currentRideTab === 'hosted') {
+            startHostedListener();
+        } else {
+            startJoinedListener();
+        }
     } else if (sectionId === 'community') {
         renderCommunity();
     } else if (sectionId === 'profile') {
@@ -968,6 +1077,9 @@ function initNavigation() {
 // ============================================
 
 async function handleLogout() {
+    // Stop all real-time listeners before logging out
+    stopAllListeners();
+    
     const result = await logoutUser();
     
     if (result.success) {
@@ -1004,6 +1116,15 @@ function initApp() {
     const saveProfileBtn = document.getElementById('saveProfile');
     if (saveProfileBtn) {
         saveProfileBtn.addEventListener('click', saveProfileData);
+    }
+    
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) {
+        // Show preview when theme is selected
+        themeSelect.addEventListener('change', (e) => {
+            const selectedTheme = THEME_COLORS[e.target.value] || THEME_COLORS.mint;
+            updateThemePreview(selectedTheme);
+        });
     }
     
     const saveThemeBtn = document.getElementById('saveTheme');
@@ -1045,20 +1166,14 @@ function initApp() {
             
             initNavigation();
             
-            // Initialize Discover Rides from Firestore (real-time)
-            try {
-                // start real-time updates
-                const dr = await import('./discover-rides.js');
-                if (dr && typeof dr.startDiscoverListener === 'function') {
-                    dr.startDiscoverListener();
-                } else if (dr && typeof dr.initializeDiscoverRides === 'function') {
-                    await dr.initializeDiscoverRides();
-                }
-            } catch (e) {
-                console.error('Failed to initialize Discover rides listener:', e);
-            }
+            // Initialize real-time listeners for Discover Rides
+            console.log('🔔 Starting real-time Discover Rides listener...');
+            startDiscoverListener();
         } else {
             // User is logged out
+            console.log('🔔 Stopping all real-time listeners...');
+            stopAllListeners();
+            
             localStorage.removeItem('currentUser');
             localStorage.removeItem('lastSection');
             try { localStorage.removeItem('uid'); } catch (e) {}
