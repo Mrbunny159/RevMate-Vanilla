@@ -16,12 +16,6 @@ import {
     signInWithPhoneNumber
 } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 import { isWebView, handleAuthRedirect, logWebViewDebug } from './webview-helper.js';
-
-// REPLACE IT WITH (or just delete it if not used):
-// We don't need these anymore since script.js uses auth-google.js for redirects
-const isWebView = () => false; // Dummy fallback
-const handleAuthRedirect = async () => null; // Dummy fallback
-const logWebViewDebug = () => {}; // Dummy fallback
 import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 
 /**

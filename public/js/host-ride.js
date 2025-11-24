@@ -84,8 +84,21 @@ export async function hostRide() {
       return;
     }
 
-    if (!startLocation || !startLocation.lat || !startLocation.lng) { showInlineMessage('Please select a valid start location.', { type: 'error', targetId: 'startLocationInput' }); return; }
-    if (!endLocation || !endLocation.lat || !endLocation.lng) { showInlineMessage('Please select a valid destination.', { type: 'error', targetId: 'endLocationInput' }); return; }
+    // Validate that the date is in the future
+    const now = new Date();
+    if (dateObj <= now) {
+      showInlineMessage('Please select a future date and time. Rides cannot be scheduled for the past.', { type: 'error', targetId: 'rideDateTime' });
+      return;
+    }
+
+    if (!startLocation || !startLocation.lat || !startLocation.lng) {
+      showInlineMessage('Please select a start location from the dropdown suggestions that appear as you type.', { type: 'error', targetId: 'startLocationInput' });
+      return;
+    }
+    if (!endLocation || !endLocation.lat || !endLocation.lng) {
+      showInlineMessage('Please select a destination from the dropdown suggestions that appear as you type.', { type: 'error', targetId: 'endLocationInput' });
+      return;
+    }
 
     // Determine organizerId: prefer `uid`, fallback to stored `currentUser` (object with id)
     // Prefer auth-based uid when available

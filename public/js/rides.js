@@ -52,7 +52,7 @@ function escapeHtml(text) {
  */
 function formatDateTime(firestoreTimestamp) {
   if (!firestoreTimestamp) return 'TBD';
-  
+
   try {
     const date = firestoreTimestamp.toDate ? firestoreTimestamp.toDate() : new Date(firestoreTimestamp);
     return date.toLocaleString('en-IN', {
@@ -71,7 +71,7 @@ function formatDateTime(firestoreTimestamp) {
  */
 function transformRideDoc(doc) {
   const data = doc.data() || {};
-  
+
   return {
     id: doc.id,
     title: data.title || 'Untitled Ride',
@@ -185,7 +185,7 @@ export function renderDiscoverRides(rides = []) {
   container.innerHTML = rides.map(ride => {
     const isJoined = currentUid && ride.participants.includes(currentUid);
     const isOrganizer = currentUid && ride.organizerId === currentUid;
-    
+
     const buttonClass = isJoined ? 'btn-joined' : 'btn-join';
     const buttonLabel = isJoined ? '✓ Joined' : '+ Join Ride';
     const buttonIcon = isJoined ? 'bi-check-circle-fill' : 'bi-plus-circle';
@@ -262,26 +262,35 @@ export async function saveRide(rideData = {}) {
 }
 
 /**
- * Attach click listeners to join/cancel buttons in Discover
+ * Attach click listeners to join/cancel buttons in Discover using event delegation
  */
 function attachDiscoverButtonListeners(container) {
-  const buttons = container.querySelectorAll('.btn-join, .btn-joined');
-  
-  buttons.forEach(btn => {
-    btn.removeEventListener('click', null); // Remove old listener
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      
-      const rideId = btn.getAttribute('data-ride-id');
-      const isJoined = btn.classList.contains('btn-joined');
-      
-      if (isJoined) {
-        await leaveRide(rideId, btn);
-      } else {
-        await joinRide(rideId, btn);
-      }
-    });
-  });
+  // Remove old listener if exists to prevent duplicates
+  const oldListener = container._discoverButtonListener;
+  if (oldListener) {
+    container.removeEventListener('click', oldListener);
+  }
+
+  // Create new delegated listener
+  const newListener = async (e) => {
+    const btn = e.target.closest('.btn-join, .btn-joined');
+    if (!btn) return;
+
+    e.preventDefault();
+
+    const rideId = btn.getAttribute('data-ride-id');
+    const isJoined = btn.classList.contains('btn-joined');
+
+    if (isJoined) {
+      await leaveRide(rideId, btn);
+    } else {
+      await joinRide(rideId, btn);
+    }
+  };
+
+  // Store reference and attach
+  container._discoverButtonListener = newListener;
+  container.addEventListener('click', newListener);
 }
 
 // ============================================
@@ -315,11 +324,11 @@ export function startHostedListener(callback) {
 
     hostedUnsubscribe = onSnapshot(q, (snapshot) => {
       const rides = snapshot.docs.map(doc => transformRideDoc(doc));
-      
+
       if (onHostedRidesChange) {
         onHostedRidesChange(rides);
       }
-      
+
       renderMyHostedRides(rides);
     }, (error) => {
       console.error('❌ Hosted listener error:', error);
@@ -436,11 +445,11 @@ export function startJoinedListener(callback) {
 
     joinedUnsubscribe = onSnapshot(q, (snapshot) => {
       const rides = snapshot.docs.map(doc => transformRideDoc(doc));
-      
+
       if (onJoinedRidesChange) {
         onJoinedRidesChange(rides);
       }
-      
+
       renderMyJoinedRides(rides);
     }, (error) => {
       console.error('❌ Joined listener error:', error);
@@ -533,63 +542,6 @@ export function renderMyJoinedRides(rides = []) {
 // ============================================
 
 /**
- * Join a ride (add user UID to participants array)
- * Prevents duplicates and provides optimistic UI update
- */
-export async function joinRide(rideId, buttonElement = null) {
-  const userId = getCurrentUid();
-  
-  if (!userId) {
-    console.error('❌ Cannot join ride: user not logged in');
-    showRideNotification('Please log in to join a ride', 'error');
-    return;
-  }
-
-  try {
-    // Get ride document to check if already joined
-    const rideRef = doc(db, 'rides', rideId);
-    const rideDoc = await getDoc(rideRef);
-
-    if (!rideDoc.exists()) {
-      console.error('❌ Ride not found');
-      showRideNotification('Ride not found', 'error');
-      return;
-    }
-
-    const rideData = rideDoc.data();
-    const participants = rideData.participants || [];
-
-    // Check for duplicates
-    if (participants.includes(userId)) {
-      showRideNotification('You already joined this ride', 'info');
-      return;
-    }
-
-    // Optimistic UI update
-    if (buttonElement) {
-      buttonElement.classList.remove('btn-join');
-      buttonElement.classList.add('btn-joined');
-      buttonElement.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>✓ Joined';
-      buttonElement.disabled = true;
-    }
-
-    // Add user to participants array
-    await updateDoc(rideRef, {
-      participants: arrayUnion(userId)
-    });
-
-    showRideNotification('Joined ride successfully!', 'success');
-    console.log('✅ Joined ride:', rideId);
-  } catch (error) {
-    console.error('❌ Error joining ride:', error);
-    showRideNotification('Failed to join ride. Please try again.', 'error');
-    
-    // Revert optimistic UI on error
-    if (buttonElement) {
-      buttonElement.classList.remove('btn-joined');
-      buttonElement.classList.add('btn-join');
-      buttonElement.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Join Ride';
-      buttonElement.disabled = false;
     }
   }
 }
@@ -603,7 +555,7 @@ export async function joinRide(rideId, buttonElement = null) {
  */
 export async function leaveRide(rideId, buttonElement = null) {
   const userId = getCurrentUid();
-  
+
   if (!userId) {
     console.error('❌ Cannot leave ride: user not logged in');
     showRideNotification('Please log in', 'error');
@@ -612,7 +564,7 @@ export async function leaveRide(rideId, buttonElement = null) {
 
   try {
     const rideRef = doc(db, 'rides', rideId);
-    
+
     // Optimistic UI update
     if (buttonElement) {
       buttonElement.disabled = true;
@@ -628,7 +580,7 @@ export async function leaveRide(rideId, buttonElement = null) {
   } catch (error) {
     console.error('❌ Error leaving ride:', error);
     showRideNotification('Failed to leave ride. Please try again.', 'error');
-    
+
     // Revert optimistic UI on error
     if (buttonElement) {
       buttonElement.disabled = false;
@@ -645,7 +597,7 @@ export async function leaveRide(rideId, buttonElement = null) {
  */
 export async function deleteRide(rideId) {
   const userId = getCurrentUid();
-  
+
   if (!userId) {
     showRideNotification('Please log in', 'error');
     return;
@@ -688,13 +640,13 @@ export function showRideNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = `ride-notification ride-notification-${type}`;
   notification.textContent = message;
-  
+
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.classList.add('show');
   }, 10);
-  
+
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => {

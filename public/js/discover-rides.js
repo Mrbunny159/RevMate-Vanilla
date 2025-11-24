@@ -14,18 +14,18 @@ import { joinRide, leaveRide } from './firebase-db.js';
 async function loadRides() {
   try {
     const snapshot = await getDocs(collection(db, 'rides'));
-    
+
     const rides = snapshot.docs.map(doc => {
       const data = doc.data();
-      
+
       // Convert Firestore timestamp to readable date
       const rideDateTime = data.rideDateTime?.toDate ? data.rideDateTime.toDate() : new Date();
-      
+
       // Extract location coordinates
       const startLocation = data.startLocation || {};
       const latitude = startLocation.latitude || 0;
       const longitude = startLocation.longitude || 0;
-      
+
       return {
         id: doc.id,
         title: data.title || 'Untitled Ride',
@@ -40,7 +40,7 @@ async function loadRides() {
         isPublic: data.isPublic
       };
     });
-    
+
     return rides;
   } catch (error) {
     console.error('Error loading rides:', error);
@@ -93,17 +93,17 @@ export function stopDiscoverListener() {
 function renderRides(rides) {
   const container = document.getElementById('discoverRides') || document.getElementById('ride-list');
   const emptyState = document.getElementById('empty-state');
-  
+
   if (!container) return;
-  
+
   if (!rides || rides.length === 0) {
     container.innerHTML = '';
     if (emptyState) emptyState.classList.remove('hidden');
     return;
   }
-  
+
   if (emptyState) emptyState.classList.add('hidden');
-  
+
   container.innerHTML = rides.map(ride => {
     const currentUid = getCurrentUid();
     const isJoined = currentUid && Array.isArray(ride.participants) && ride.participants.includes(currentUid);
@@ -162,16 +162,29 @@ function renderRides(rides) {
     `;
   }).join('');
 
-  // Attach event listeners to join/cancel buttons
-  const buttons = container.querySelectorAll('.btn-join');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const rideId = btn.getAttribute('data-ride-id');
-      const action = btn.getAttribute('data-action');
-      if (action === 'join') await joinRide(rideId, btn);
-      else if (action === 'leave') await leaveRide(rideId, btn);
-    });
-  });
+  // Use event delegation to prevent memory leaks
+  // Remove old listener if exists
+  const oldListener = container._rideButtonListener;
+  if (oldListener) {
+    container.removeEventListener('click', oldListener);
+  }
+
+  // Create new listener with event delegation
+  const newListener = async (e) => {
+    const btn = e.target.closest('.btn-join');
+    if (!btn) return;
+
+    e.preventDefault();
+    const rideId = btn.getAttribute('data-ride-id');
+    const action = btn.getAttribute('data-action');
+
+    if (action === 'join') await joinRide(rideId, btn);
+    else if (action === 'leave') await leaveRide(rideId, btn);
+  };
+
+  // Store reference and attach
+  container._rideButtonListener = newListener;
+  container.addEventListener('click', newListener);
 }
 
 
@@ -213,13 +226,13 @@ function showRideNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = `ride-notification ride-notification-${type}`;
   notification.textContent = message;
-  
+
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.classList.add('show');
   }, 10);
-  
+
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
