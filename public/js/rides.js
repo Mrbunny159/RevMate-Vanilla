@@ -542,6 +542,76 @@ export function renderMyJoinedRides(rides = []) {
 // ============================================
 
 /**
+ * Join a ride (add user UID to participants array)
+ * Prevents duplicates and provides optimistic UI update with rate limiting
+ */
+export async function joinRide(rideId, buttonElement = null) {
+  const userId = getCurrentUid();
+
+  if (!userId) {
+    console.error('❌ Cannot join ride: user not logged in');
+    showRideNotification('Please log in to join a ride', 'error');
+    return;
+  }
+
+  // Rate limiting - prevent multiple clicks
+  if (buttonElement && buttonElement.disabled) {
+    return; // Already processing
+  }
+
+  try {
+    // Disable button immediately to prevent spam
+    if (buttonElement) {
+      buttonElement.disabled = true;
+    }
+
+    // Get ride document to check if already joined
+    const rideRef = doc(db, 'rides', rideId);
+    const rideDoc = await getDoc(rideRef);
+
+    if (!rideDoc.exists()) {
+      console.error('❌ Ride not found');
+      showRideNotification('Ride not found', 'error');
+      if (buttonElement) buttonElement.disabled = false;
+      return;
+    }
+
+    const rideData = rideDoc.data();
+    const participants = rideData.participants || [];
+
+    // Check for duplicates
+    if (participants.includes(userId)) {
+      showRideNotification('You already joined this ride', 'info');
+      if (buttonElement) buttonElement.disabled = false;
+      return;
+    }
+
+    // Optimistic UI update
+    if (buttonElement) {
+      buttonElement.classList.remove('btn-join');
+      buttonElement.classList.add('btn-joined');
+      buttonElement.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>✓ Joined';
+    }
+
+    // Add user to participants array
+    await updateDoc(rideRef, {
+      participants: arrayUnion(userId)
+    });
+
+    showRideNotification('Joined ride successfully!', 'success');
+    console.log('✅ Joined ride:', rideId);
+
+    // Keep button disabled (joined state)
+  } catch (error) {
+    console.error('❌ Error joining ride:', error);
+    showRideNotification('Failed to join ride. Please try again.', 'error');
+
+    // Revert optimistic UI on error
+    if (buttonElement) {
+      buttonElement.classList.remove('btn-joined');
+      buttonElement.classList.add('btn-join');
+      buttonElement.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Join Ride';
+      buttonElement.disabled = false;
     }
   }
 }

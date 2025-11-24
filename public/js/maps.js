@@ -34,29 +34,63 @@ function safe(elOrId) {
   return typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
 }
 
-// Create Place Autocomplete element (new standard) or fallback to Autocomplete
+// Create Place Autocomplete using NEW Web Component API (for keys created after Nov 2024)
+// Or fallback to old Autocomplete for legacy keys
 function createAutocomplete(inputEl) {
   if (!inputEl) return null;
 
+  // Try NEW PlaceAutocompleteElement (Web Component) first
+  // This is REQUIRED for API keys created after March 1, 2025
   if (window.google && window.google.maps && window.google.maps.places && window.google.maps.places.PlaceAutocompleteElement) {
     try {
-      // New Places Autocomplete Element
-      const pae = new window.google.maps.places.PlaceAutocompleteElement({ input: inputEl });
-      return pae;
+      console.log('✅ Using NEW PlaceAutocompleteElement Web Component for:', inputEl.id);
+
+      // Create the web component
+      const autocompleteElement = new window.google.maps.places.PlaceAutocompleteElement({
+        // Don't pass 'input' - that was the OLD API!
+        // The web component creates its own input
+      });
+
+      // Replace the old input with the web component
+      const wrapper = inputEl.parentElement;
+      wrapper.replaceChild(autocompleteElement, inputEl);
+
+      // Store reference to the web component
+      autocompleteElement._originalInputId = inputEl.id;
+      autocompleteElement._originalInput = inputEl;
+
+      // Update the autocomplete element's input styling to match
+      setTimeout(() => {
+        const innerInput = autocompleteElement.querySelector('input');
+        if (innerInput) {
+          innerInput.className = inputEl.className;
+          innerInput.placeholder = inputEl.placeholder;
+          innerInput.id = inputEl.id;
+          innerInput.required = inputEl.required;
+        }
+      }, 100);
+
+      return autocompleteElement;
+
     } catch (err) {
-      console.warn('PlaceAutocompleteElement init failed, falling back to Autocomplete:', err);
+      console.warn('⚠️ PlaceAutocompleteElement failed, falling back to old API:', err);
     }
   }
 
-  // Fallback: older Autocomplete
+  // FALLBACK: Use old Autocomplete API (for legacy keys or if new one fails)
   if (window.google && window.google.maps && window.google.maps.places && window.google.maps.places.Autocomplete) {
     try {
-      return new window.google.maps.places.Autocomplete(inputEl);
+      console.log('📍 Using legacy Autocomplete API for:', inputEl.id);
+      return new window.google.maps.places.Autocomplete(inputEl, {
+        fields: ['name', 'formatted_address', 'geometry', 'place_id']
+      });
     } catch (err) {
-      console.warn('Fallback Autocomplete init failed:', err);
+      console.error('❌ Autocomplete initialization failed:', err);
+      return null;
     }
   }
 
+  console.warn('⚠️ Google Maps Places API not available');
   return null;
 }
 
@@ -130,43 +164,65 @@ export async function initializeMaps({ startInputId = 'startLocationInput', endI
   const startAuto = createAutocomplete(startEl);
   const endAuto = createAutocomplete(endEl);
 
-  // Handle selection events: try both new and fallback event names
+  // Handle selection events
+  // The NEW API uses 'gmp-placeselect' event
+  // The OLD API uses 'place_changed' event
   if (startAuto) {
-    if (startAuto.addListener) {
-      // fallback Autocomplete
+    // Check if it's the new Web Component
+    if (startAuto.tagName && startAuto.tagName.toLowerCase() === 'gmp-placeautocomplete') {
+      // NEW API: Listen for gmp-placeselect event
+      startAuto.addEventListener('gmp-placeselect', async ({ place }) => {
+        console.log('📍 Start location selected (new API):', place);
+        if (place && place.fetchFields) {
+          await place.fetchFields({ fields: ['displayName', 'formattedAddress', 'location'] });
+          const placeData = {
+            name: place.displayName,
+            formatted_address: place.formattedAddress,
+            geometry: {
+              location: {
+                lat: () => place.location.lat(),
+                lng: () => place.location.lng()
+              }
+            }
+          };
+          setStart(placeData);
+        }
+      });
+    } else if (startAuto.addListener) {
+      // OLD API: fallback Autocomplete
       startAuto.addListener('place_changed', () => {
         const place = startAuto.getPlace ? startAuto.getPlace() : null;
         setStart(place);
-      });
-    } else if (startAuto.input) {
-      // PlaceAutocompleteElement may not have addListener; listen on input blur and try reverse geocode
-      startEl.addEventListener('change', async () => {
-        // try to fetch details using PlacesService
-        const placesService = new window.google.maps.places.PlacesService(map);
-        const val = startEl.value;
-        if (!val) return;
-        try {
-          const r = await findPlaceByText(val);
-          setStart(r?.candidates?.[0] || null);
-        } catch (e) { console.warn(e); }
       });
     }
   }
 
   if (endAuto) {
-    if (endAuto.addListener) {
+    // Check if it's the new Web Component
+    if (endAuto.tagName && endAuto.tagName.toLowerCase() === 'gmp-placeautocomplete') {
+      // NEW API: Listen for gmp-placeselect event
+      endAuto.addEventListener('gmp-placeselect', async ({ place }) => {
+        console.log('📍 End location selected (new API):', place);
+        if (place && place.fetchFields) {
+          await place.fetchFields({ fields: ['displayName', 'formattedAddress', 'location'] });
+          const placeData = {
+            name: place.displayName,
+            formatted_address: place.formattedAddress,
+            geometry: {
+              location: {
+                lat: () => place.location.lat(),
+                lng: () => place.location.lng()
+              }
+            }
+          };
+          setEnd(placeData);
+        }
+      });
+    } else if (endAuto.addListener) {
+      // OLD API: fallback Autocomplete
       endAuto.addListener('place_changed', () => {
         const place = endAuto.getPlace ? endAuto.getPlace() : null;
         setEnd(place);
-      });
-    } else if (endAuto.input) {
-      endEl.addEventListener('change', async () => {
-        const val = endEl.value;
-        if (!val) return;
-        try {
-          const r = await findPlaceByText(val);
-          setEnd(r?.candidates?.[0] || null);
-        } catch (e) { console.warn(e); }
       });
     }
   }

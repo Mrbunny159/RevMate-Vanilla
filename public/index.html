@@ -1,57 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RevMate - Ride Together</title>
-  
+
 
   <link rel="icon" type="image/png" href="/icons/app.png">
-<link rel="icon" href="/icons/icon-192.png">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
 
-<!-- PWA Icons -->
-<link rel="icon" sizes="192x192" href="/icons/app.png">
-<link rel="icon" sizes="512x512" href="/icons/app.png">
+  <!-- PWA Icons -->
+  <link rel="icon" sizes="192x192" href="/icons/app.png">
+  <link rel="icon" sizes="512x512" href="/icons/app.png">
 
-<!-- Maskable Icon (Android Home Screen) -->
-<link rel="icon" sizes="512x512" href="/icons/app.png" purpose="maskable">
+  <!-- Maskable Icon (Android Home Screen) -->
+  <link rel="icon" sizes="512x512" href="/icons/app.png" purpose="maskable">
 
-<!-- Apple Touch Icon (iOS Home Screen) -->
-<link rel="apple-touch-icon" href="/icons/app.png">
+  <!-- Apple Touch Icon (iOS Home Screen) -->
+  <link rel="apple-touch-icon" href="/icons/app.png">
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#CDB4DB">
   <meta name="description" content="Your riding companion - Find and host motorcycle rides">
-  
+
   <!-- iOS PWA Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="RevMate">
-  
+
   <!-- Apple Touch Icons -->
   <link rel="apple-touch-icon" href="/icons/icon-180.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
   <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
   <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
-  
+
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
-    
+
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    
+
   <!-- Bootstrap Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
-    
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+    rel="stylesheet">
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
   <!-- External Stylesheets -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/rides.css">
@@ -65,12 +67,12 @@
           navigator.serviceWorker.register("/service-worker.js")
             .then((registration) => {
               console.log("[SW] Service Worker registered:", registration.scope);
-              
+
               // Check for updates
               registration.addEventListener('updatefound', () => {
                 const newWorker = registration.installing;
                 console.log("[SW] New service worker found");
-                
+
                 newWorker.addEventListener('statechange', () => {
                   if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                     // New service worker available
@@ -95,6 +97,7 @@
   <!-- Firebase SDK and app initialization are imported as ES modules from CDN
      (modules are imported by `script.js` using relative module imports) -->
 </head>
+
 <body>
 
   <!-- Authentication Section -->
@@ -125,7 +128,7 @@
       <div class="social-divider">
         <span>or continue with</span>
       </div>
-            
+
       <div class="social-login-buttons">
         <button type="button" class="btn btn-social btn-google" id="login-google">
           <i class="bi bi-google"></i> Google
@@ -190,7 +193,7 @@
       <div class="social-divider hidden" id="signup-social-divider">
         <span>or sign up with</span>
       </div>
-            
+
       <div class="social-login-buttons hidden" id="signup-social-buttons">
         <button type="button" class="btn btn-social btn-google" id="signup-google">
           <i class="bi bi-google"></i> Google
@@ -209,7 +212,7 @@
 
   <!-- Main App Container -->
   <div id="app-container" class="hidden">
-        
+
     <!-- Home Section -->
     <section id="home" class="app-section active">
       <div class="container">
@@ -279,18 +282,18 @@
           <h2>Discover Rides 🗺️</h2>
           <p>Find your next adventure</p>
         </div>
-                <div style="display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:14px;">
-                  <label for="radiusSelect" style="margin:0;font-weight:600;color:#444;">Radius:</label>
-                  <select id="radiusSelect">
-                    <option value="5">5 km</option>
-                    <option value="10">10 km</option>
-                    <option value="25">25 km</option>
-                    <option value="50">50 km</option>
-                  </select>
-                </div>
-                
+        <div style="display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:14px;">
+          <label for="radiusSelect" style="margin:0;font-weight:600;color:#444;">Radius:</label>
+          <select id="radiusSelect">
+            <option value="5">5 km</option>
+            <option value="10">10 km</option>
+            <option value="25">25 km</option>
+            <option value="50">50 km</option>
+          </select>
+        </div>
+
         <div id="discoverRides" class="row g-3"></div>
-                
+
         <div id="empty-state" class="placeholder-content hidden">
           <i class="bi bi-inbox" style="font-size: 4rem; color: var(--primary);"></i>
           <p>No rides available yet. Be the first to host one!</p>
@@ -305,7 +308,7 @@
           <h2>Host a Ride 🏍️</h2>
           <p>Create your own adventure</p>
         </div>
-                
+
         <div class="host-form-container">
           <form id="hostRideForm" class="host-form" onsubmit="return false;">
             <div class="mb-3">
@@ -319,33 +322,36 @@
             </div>
 
             <div class="mb-3">
-                      <div class="mb-2">
-                        <button id="useCurrentLocation" class="btn btn-secondary">Use My Current Location</button>
-                      </div>
+              <div class="mb-2">
+                <button id="useCurrentLocation" class="btn btn-secondary">Use My Current Location</button>
+              </div>
 
-                      <div class="mb-3">
-                        <label for="startLocationInput" class="form-label">Start Location</label>
-                        <input type="text" id="startLocationInput" class="form-control" placeholder="Start Location" autocomplete="off" required>
-                      </div>
+              <div class="mb-3">
+                <label for="startLocationInput" class="form-label">Start Location</label>
+                <input type="text" id="startLocationInput" class="form-control" placeholder="Start Location"
+                  autocomplete="off" required>
+              </div>
 
-                      <div class="mb-3">
-                        <label for="endLocationInput" class="form-label">Destination</label>
-                        <input type="text" id="endLocationInput" class="form-control" placeholder="Destination" autocomplete="off" required>
-                      </div>
+              <div class="mb-3">
+                <label for="endLocationInput" class="form-label">Destination</label>
+                <input type="text" id="endLocationInput" class="form-control" placeholder="Destination"
+                  autocomplete="off" required>
+              </div>
 
-                      <div id="mapPreviewContainer" class="mb-3 hidden">
-                        <div id="mapPreview" style="width:100%;height:260px;border-radius:12px;overflow:hidden;border:1px solid #e8e8e8;"></div>
-                        <div id="routeInfo" style="margin-top:10px;font-size:0.95rem;color:#444;">
-                          <div id="distanceText">Distance: —</div>
-                          <div id="durationText">Estimated Duration: —</div>
-                        </div>
-                      </div>
+              <div id="mapPreviewContainer" class="mb-3 hidden">
+                <div id="mapPreview"
+                  style="width:100%;height:260px;border-radius:12px;overflow:hidden;border:1px solid #e8e8e8;"></div>
+                <div id="routeInfo" style="margin-top:10px;font-size:0.95rem;color:#444;">
+                  <div id="distanceText">Distance: —</div>
+                  <div id="durationText">Estimated Duration: —</div>
+                </div>
+              </div>
 
-            <div class="d-grid">
-              <button id="hostRideBtn" type="button" class="btn btn-host w-100">
-                <i class="bi bi-plus-circle me-2"></i>Host Ride
-              </button>
-            </div>
+              <div class="d-grid">
+                <button id="hostRideBtn" type="button" class="btn btn-host w-100">
+                  <i class="bi bi-plus-circle me-2"></i>Host Ride
+                </button>
+              </div>
           </form>
         </div>
       </div>
@@ -358,7 +364,7 @@
           <h2>My Rides 📋</h2>
           <p>Your riding history</p>
         </div>
-                
+
         <div class="rides-tabs">
           <button class="tab-btn active" id="btnHosted" data-tab="hosted">
             <i class="bi bi-flag-fill me-2"></i>Hosted
@@ -367,7 +373,7 @@
             <i class="bi bi-check-circle-fill me-2"></i>Joined
           </button>
         </div>
-                
+
         <div id="myRidesContainer" class="my-rides-container"></div>
       </div>
     </section>
@@ -379,9 +385,9 @@
           <h2>Community 👥</h2>
           <p>Connect with riders</p>
         </div>
-                
+
         <div id="communityList" class="community-list"></div>
-                
+
         <div id="community-empty-state" class="placeholder-content hidden">
           <i class="bi bi-people" style="font-size: 4rem; color: var(--primary);"></i>
           <p>No riders in your area yet</p>
@@ -396,7 +402,7 @@
           <h2>Profile ⚙️</h2>
           <p>Manage your account</p>
         </div>
-                
+
         <div class="profile-container">
           <!-- User Information -->
           <div class="profile-card">
@@ -462,7 +468,8 @@
               <span>Add RevMate to Home Screen</span>
             </button>
             <div id="ios-install-hint" class="ios-install-hint" style="display: none;">
-              <small><strong>iOS:</strong> Tap Share <span style="font-size: 1.2em;">📤</span> → "Add to Home Screen"</small>
+              <small><strong>iOS:</strong> Tap Share <span style="font-size: 1.2em;">📤</span> → "Add to Home
+                Screen"</small>
             </div>
             <div id="install-status" class="install-status" style="display: none;"></div>
             <small class="install-hint">Available on Android, iOS, and Desktop</small>
@@ -506,8 +513,10 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
   <!-- Google Maps API - async and defer for optimal loading -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly"></script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly"></script>
 
   <script type="module" src="js/script.js"></script>
 </body>
+
 </html>

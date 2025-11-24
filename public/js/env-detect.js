@@ -32,7 +32,7 @@
 export function detectEnvironment() {
   const userAgent = navigator.userAgent || '';
   const ua = userAgent.toLowerCase();
-  
+
   // Result object
   const result = {
     isWebView: false,
@@ -44,13 +44,13 @@ export function detectEnvironment() {
       features: {}
     }
   };
-  
+
   // ==========================================
   // 1. USER-AGENT STRING CHECKS
   // ==========================================
-  
+
   // Android WebView patterns
-  const isAndroidWebView = 
+  const isAndroidWebView =
     /android/.test(ua) && (
       /wv\)/.test(ua) ||           // Chrome WebView: "Android 10; wv)"
       /webkit/.test(ua) && !/chrome\/[\d.]+/.test(ua) ||  // WebKit but not Chrome
@@ -58,12 +58,12 @@ export function detectEnvironment() {
       /;\s*wv\s*\)/.test(ua) ||    // Strict wv check
       /webview/.test(ua)           // Generic WebView string
     );
-  
+
   result.details.ua.isAndroidWebView = isAndroidWebView;
-  
+
   // iOS WebView patterns
   // Key indicators: iPhone/iPad + NOT Safari + AppleWebKit
-  const isIOSWebView = 
+  const isIOSWebView =
     /iphone|ipad|ipod/.test(ua) && (
       !/safari/.test(ua) || /webview/.test(ua)
     ) && (
@@ -71,61 +71,63 @@ export function detectEnvironment() {
       /wkwebview/.test(ua) ||
       /uiwebview/.test(ua)
     );
-  
+
   result.details.ua.isIOSWebView = isIOSWebView;
-  
+
   // Cordova/Capacitor (hybrid app frameworks)
   const isCordova = /cordova|capacitor|phonegap/.test(ua);
   result.details.ua.isCordova = isCordova;
-  
+
   // Median.co wrapper (specific UA or headers)
   const isMedian = /median/.test(ua);
   result.details.ua.isMedian = isMedian;
-  
+
   // WebViewGold (no-code app wrapper)
   const isWebViewGold = /webviewgold/.test(ua);
   result.details.ua.isWebViewGold = isWebViewGold;
-  
+
   // ==========================================
   // 2. WINDOW OBJECT PROPERTY CHECKS
   // ==========================================
-  
+
   // Cordova global (Cordova/Capacitor framework)
   const hasCordova = typeof window.cordova !== 'undefined';
   result.details.window.hasCordova = hasCordova;
-  
+
   // iOS WKWebView bridge (newer iOS WebView)
-  const hasWebKitMessageHandlers = 
+  const hasWebKitMessageHandlers =
     typeof window.webkit !== 'undefined' &&
     typeof window.webkit.messageHandlers !== 'undefined';
   result.details.window.hasWebKitMessageHandlers = hasWebKitMessageHandlers;
-  
-  // iOS older UIWebView
-  const hasUIWebView = typeof window.documentElement._uiwebview !== 'undefined';
+
+  // iOS older UIWebView (add safety check)
+  const hasUIWebView =
+    window.documentElement &&
+    typeof window.documentElement._uiwebview !== 'undefined';
   result.details.window.hasUIWebView = hasUIWebView;
-  
+
   // Median.co injection (wrapper may set custom global)
   const hasMedianGlobal = typeof window.median !== 'undefined' || typeof window.__MEDIAN__ !== 'undefined';
   result.details.window.hasMedianGlobal = hasMedianGlobal;
-  
+
   // Check for any wrapper-specific globals
-  const hasWrapperGlobals = 
+  const hasWrapperGlobals =
     typeof window._isInAppWebView !== 'undefined' ||
     typeof window.__wrapper__ !== 'undefined' ||
     typeof window.__WEBVIEW__ !== 'undefined' ||
     typeof window.external !== 'undefined' && typeof window.external.notify !== 'undefined';
   result.details.window.hasWrapperGlobals = hasWrapperGlobals;
-  
+
   // ==========================================
   // 3. FEATURE DETECTION
   // ==========================================
-  
+
   // iOS standalone web app mode (PWA on home screen)
-  const isIOSStandalone = 
+  const isIOSStandalone =
     navigator.standalone === true ||
     (window.navigator.standalone !== undefined && window.navigator.standalone);
   result.details.features.isIOSStandalone = isIOSStandalone;
-  
+
   // Check for DevTools (available in browser, not in WebView)
   // This is a weak signal but useful
   const hasDevTools = () => {
@@ -143,15 +145,15 @@ export function detectEnvironment() {
     }
   };
   // Don't use this as primary signal; WebView can have console too
-  
+
   // Check hardware concurrency (weak signal)
   const hardwareConcurrency = navigator.hardwareConcurrency || 'unknown';
   result.details.features.hardwareConcurrency = hardwareConcurrency;
-  
+
   // ==========================================
   // 4. COMPOSITE DETECTION & CLASSIFICATION
   // ==========================================
-  
+
   if (isAndroidWebView) {
     result.isWebView = true;
     result.type = 'android';
@@ -177,7 +179,7 @@ export function detectEnvironment() {
     result.isWebView = false;
     result.type = 'plain-browser';
   }
-  
+
   return result;
 }
 
@@ -223,20 +225,20 @@ export function isWrapperType(type) {
  */
 export function canOpenExternalBrowser() {
   const env = detectEnvironment();
-  
+
   // These types CAN open external browser via redirect
   const supportRedirect = ['android', 'ios', 'cordova', 'median', 'webviewgold'];
-  
+
   if (!env.isWebView) {
     // Plain browser can always open (popup or external)
     return true;
   }
-  
+
   if (supportRedirect.includes(env.type)) {
     // These wrappers support signInWithRedirect (opens external browser)
     return true;
   }
-  
+
   // For unknown wrappers, assume they might support redirect
   // (worst case: OAuth fails and fallback to email is shown)
   return true;
@@ -252,14 +254,14 @@ export function canOpenExternalBrowser() {
 export function logEnvironmentDetection(stage = '', additionalData = {}) {
   const env = detectEnvironment();
   const timestamp = new Date().toISOString();
-  
+
   const logEntry = {
     timestamp,
     stage: stage || 'UNKNOWN',
     environment: env,
     ...additionalData
   };
-  
+
   // Log to console
   const prefix = env.isWebView ? '📱' : '🖥️';
   const typeStr = env.isWebView ? `${env.type}` : 'browser';
@@ -267,7 +269,7 @@ export function logEnvironmentDetection(stage = '', additionalData = {}) {
     `${prefix} [${stage}] Environment: ${typeStr}`,
     logEntry
   );
-  
+
   // Store in sessionStorage for inspection
   try {
     const logs = JSON.parse(sessionStorage.getItem('env_detection_logs') || '[]');
@@ -314,7 +316,7 @@ export function clearEnvironmentDetectionLogs() {
  */
 export function getEnvironmentSummary() {
   const env = detectEnvironment();
-  
+
   if (env.type === 'plain-browser') {
     return 'Desktop/Mobile Browser';
   } else if (env.type === 'android') {
