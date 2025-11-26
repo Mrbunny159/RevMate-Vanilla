@@ -50,12 +50,10 @@ import {
 import { renderDiscoverRides } from './rides.js';
 import { haversineDistanceKm } from './utils/distance.js';
 
-<<<<<<< HEAD
-=======
+
 // Import UX helpers
 import { showToast, showSuccess, showError, showWarning, showInfo, renderEmptyState, showLoadingSkeleton } from './utils/ux-helpers.js';
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 // Host ride module (wires host button + load/refresh)
 import './host-ride.js';
 
@@ -76,7 +74,6 @@ function saveData(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
-<<<<<<< HEAD
 function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
     if (!alertContainer) return;
@@ -106,7 +103,7 @@ function showRideAlert(message) {
         alert.style.animation = 'fadeOut 0.3s ease';
         setTimeout(() => alert.remove(), 300);
     }, 2500);
-=======
+
 // Use new toast system instead of old alerts
 function showAlert(message, type = 'success') {
     if (type === 'danger' || type === 'error') {
@@ -122,7 +119,6 @@ function showAlert(message, type = 'success') {
 
 function showRideAlert(message, type = 'success') {
     showAlert(message, type);
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 }
 
 // ============================================
@@ -431,7 +427,6 @@ function formatDate(dateString) {
 async function loadDiscoverRides() {
     // Start real-time listener for public rides with radius filtering
     let userLocation = null;
-<<<<<<< HEAD
     const radiusSelect = document.getElementById('radiusSelect');
     let cachedRides = [];
 
@@ -458,7 +453,8 @@ async function loadDiscoverRides() {
             if (lat == null || lng == null) return false;
             const d = haversineDistanceKm(userLocation.lat, userLocation.lng, Number(lat), Number(lng));
             return d <= radiusKm;
-=======
+        
+
     let currentRadius = 25; // Default radius in km
     let cachedRides = [];
 
@@ -498,18 +494,18 @@ async function loadDiscoverRides() {
             );
 
             return distance <= currentRadius;
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
+
         });
 
         renderDiscoverRides(filtered);
     }
 
-<<<<<<< HEAD
+
     // Re-run filter when radius changes
     if (radiusSelect) {
         radiusSelect.addEventListener('change', () => { filterAndRender(cachedRides); });
     }
-=======
+
     // Setup radius chip button handlers
     const chipButtons = document.querySelectorAll('.chip-btn[data-radius]');
     const radiusDisplayText = document.getElementById('currentRadiusText');
@@ -536,7 +532,7 @@ async function loadDiscoverRides() {
             console.log(`📏 Radius updated to: ${currentRadius} km`);
         });
     });
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
+
 
     // Start listener with callback to receive all rides and then filter
     startDiscoverListener((rides) => {
@@ -547,14 +543,12 @@ async function loadDiscoverRides() {
 
 /**
  * Refresh discover rides when returning to tab
- */
+ */)}
 async function refreshDiscoverRides() {
     // Already listening in real-time, no need to refresh
     console.log('ℹ️ Discover rides are syncing in real-time');
 }
 
-<<<<<<< HEAD
-=======
 function initNavigation() {
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
@@ -606,7 +600,7 @@ function initNavigation() {
     }
 }
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
+
 function initHostRideForm() {
     const hostForm = document.getElementById('hostRideForm');
 
@@ -661,7 +655,7 @@ function initHostRideForm() {
 // ============================================
 // MY RIDES - Real-Time Sync (Hosted & Joined)
 // ============================================
-
+    }
 let currentRideTab = 'hosted';
 
 function renderMyRides(type = 'hosted') {
@@ -723,7 +717,6 @@ function initMyRidesTabs() {
 }
 
 // ============================================
-<<<<<<< HEAD
 // COMMUNITY
 // ============================================
 
@@ -861,7 +854,6 @@ function followMember(memberId) {
     saveData('currentUser', currentUser);
     renderCommunity();
     showRideAlert(`Now following ${member.name}!`);
-=======
 // COMMUNITY (Real-time Firestore Integration)
 // ============================================
 
@@ -909,7 +901,6 @@ function initCommunity() {
     }
 
     console.log('✅ Community initialized');
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 }
 
 // ============================================
@@ -958,7 +949,6 @@ function toggleAuthMode() {
 }
 
 // ============================================
-<<<<<<< HEAD
 // SIGNUP LOGIC
 // ============================================
 
@@ -1021,8 +1011,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
 document.addEventListener('click', async (e) => {
     // Google login button - use hybrid popup/redirect flow
-    if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')) {
-=======
+    if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')){
 // AUTH EVENT LISTENERS (Initialized on DOM Ready)
 // ============================================
 
@@ -1092,7 +1081,6 @@ function initAuthEventListeners() {
         document.addEventListener('click', async (e) => {
             // Google login button - use hybrid popup/redirect flow
             if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')) {
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         console.log('🔐 Google Login clicked');
         e.preventDefault();
         e.stopPropagation();
@@ -1223,21 +1211,19 @@ function initAuthEventListeners() {
             showAlert('Error: ' + err.message, 'danger');
         }
         return;
-<<<<<<< HEAD
+
     }
 });
-=======
+
             }
-        });
+        };
     }
-}
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
+
 
 // ============================================
 // PHONE LOGIN - TOGGLE FORMS
 // ============================================
 
-<<<<<<< HEAD
 const togglePhoneLoginBtn = document.getElementById('toggle-phone-login');
 const togglePhoneBackBtn = document.getElementById('toggle-phone-back');
 const phoneLoginForm = document.getElementById('phone-login-form');
@@ -1270,7 +1256,7 @@ if (togglePhoneBackBtn) {
 
 if (phoneLoginForm) {
     phoneLoginForm.addEventListener('submit', async (e) => {
-=======
+
 function initPhoneLoginHandlers() {
     const togglePhoneLoginBtn = document.getElementById('toggle-phone-login');
     const togglePhoneBackBtn = document.getElementById('toggle-phone-back');
@@ -1301,7 +1287,6 @@ function initPhoneLoginHandlers() {
     // PHONE LOGIN - SEND CODE
     if (phoneLoginForm) {
         phoneLoginForm.addEventListener('submit', async (e) => {
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         e.preventDefault();
 
         const phoneNumber = document.getElementById('phone-number').value.trim();
@@ -1334,7 +1319,6 @@ function initPhoneLoginHandlers() {
         } catch (error) {
             showAlert(error.message, 'danger');
         }
-<<<<<<< HEAD
     });
 }
 
@@ -1371,8 +1355,8 @@ if (phoneVerifyForm) {
             showAlert(result.error, 'danger');
         }
     });
-=======
-        });
+
+        };
     }
 
     // PHONE LOGIN - VERIFY CODE
@@ -1406,7 +1390,6 @@ if (phoneVerifyForm) {
             }
         });
     }
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 }
 
 // ============================================
@@ -1481,7 +1464,6 @@ function showSection(sectionId) {
     }
 }
 
-<<<<<<< HEAD
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
 
@@ -1512,8 +1494,7 @@ function initNavigation() {
     }
 }
 
-=======
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
+
 // ============================================
 // LOGOUT LOGIC (PHASE 5)
 // ============================================
@@ -1700,12 +1681,11 @@ window.addEventListener('load', () => {
     applySavedTheme();
     // Initialize PWA install prompt
     initInstallPrompt();
-<<<<<<< HEAD
 });
 
 // Run initialization
 initApp();
-=======
+
 
     // Initialize description character counter
     initDescriptionCounter();
@@ -1764,7 +1744,6 @@ function initializeApp() {
     // Run main app initialization
     initApp();
 }
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
 // ============================================
 // END OF SCRIPT
