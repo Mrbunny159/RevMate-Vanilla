@@ -1,0 +1,14 @@
+/* Additional styles for follow button states */
+
+.btn-follow-pending {
+    background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+}
+
+.btn-follow-following {
+    background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+}
+
+.btn-follow-pending:hover,
+.btn-follow-following:hover {
+    opacity: 0.9;
+}

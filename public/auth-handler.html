@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Completing Sign-In... - RevMate</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .auth-handler-container {
+      text-align: center;
+      background: white;
+      padding: 3rem 2rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem auto;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    p {
+      color: #666;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .error-container {
+      background: #fee;
+      border: 1px solid #fcc;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .error-container.show {
+      display: block;
+    }
+    
+    .error-title {
+      color: #c33;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .error-message {
+      color: #666;
+      font-size: 0.9rem;
+      text-align: left;
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #ddd;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #ccc;
+    }
+    
+    .info-text {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-handler-container">
+    <div class="spinner"></div>
+    
+    <h1>Completing Sign-In</h1>
+    <p>Please wait while we verify your credentials and redirect you back to RevMate...</p>
+    
+    <!-- Error container (hidden by default) -->
+    <div class="error-container" id="error-container">
+      <div class="error-title">⚠️ Sign-In Error</div>
+      <div class="error-message" id="error-message"></div>
+      <div class="button-group">
+        <button class="btn-secondary" onclick="window.location.href='/?error=signin_failed'">
+          Back to Login
+        </button>
+        <button class="btn-primary" onclick="window.location.reload()">
+          Retry
+        </button>
+      </div>
+    </div>
+    
+    <p class="info-text">
+      🔒 This page securely handles your authentication.
+      <br>You will not be asked for your password here.
+    </p>
+  </div>
+
+  <!-- Auth handler init script (ES Module) -->
+  <script type="module" src="js/auth-handler-init.js"></script>
+
+</body>
+</html>

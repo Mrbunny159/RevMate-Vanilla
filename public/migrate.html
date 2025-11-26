@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Migration - RevMate</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #252526;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: #3a2a1a;
+            border-left: 4px solid #f0ad4e;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #f0ad4e;
+        }
+
+        .info {
+            background: #1a2a3a;
+            border-left: 4px solid #5bc0de;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        button.danger {
+            background: #d9534f;
+        }
+
+        button.danger:hover {
+            background: #c9302c;
+        }
+
+        #output {
+            background: #1e1e1e;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #3c3c3c;
+        }
+
+        .log-info {
+            color: #4ec9b0;
+        }
+
+        .log-success {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        .log-error {
+            color: #f48771;
+        }
+
+        .log-warning {
+            color: #f0ad4e;
+        }
+
+        .log-skip {
+            color: #808080;
+        }
+
+        pre {
+            margin: 5px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔄 RevMate Database Migration</h1>
+        <p style="color: #858585; margin-bottom: 20px;">Migrate rides to new data structure</p>
+
+        <div class="warning">
+            <strong>⚠️ WARNING:</strong> This will modify your Firestore database!
+            <ul style="margin: 10px 0 0 20px;">
+                <li>Converts startLocation/endLocation to GeoPoint format</li>
+                <li>Adds location metadata (names, addresses)</li>
+                <li>Adds missing endLocation to rides</li>
+                <li>Removes duplicate hostId fields</li>
+                <li>Adds description and isPublic fields</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <strong>ℹ️ INFO:</strong> This migration is safe and will:
+            <ul style="margin: 10px 0 0 20px;">
+                <li>NOT delete any data</li>
+                <li>Add missing fields with defaults</li>
+                <li>Preserve existing ride information</li>
+                <li>Log all changes for review</li>
+            </ul>
+        </div>
+
+        <div>
+            <button id="runMigration" class="danger">▶ Run Migration</button>
+            <button id="clearOutput">🗑️ Clear Output</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            doc,
+            updateDoc,
+            GeoPoint
+        } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+
+        // Import Firebase config from your existing module
+        import { app, db } from './js/firebase-config.js';
+
+        const output = document.getElementById('output');
+        const runButton = document.getElementById('runMigration');
+
+        function log(message, type = 'info') {
+            const pre = document.createElement('pre');
+            pre.className = `log-${type}`;
+            pre.textContent = message;
+            output.appendChild(pre);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        document.getElementById('clearOutput').addEventListener('click', () => {
+            output.innerHTML = '';
+        });
+        runButton.addEventListener('click', async () => {
+            runButton.disabled = true;
+            output.innerHTML = '';
+
+            log('🚀 RevMate Firestore Migration Script', 'info');
+            log('📋 This will migrate your rides to the new data structure\n', 'info');
+            log('═'.repeat(60), 'info');
+
+            await migrateRides();
+
+            log('\n' + '═'.repeat(60), 'info');
+            log('✨ Migration process completed!', 'success');
+            runButton.disabled = false;
+        });
+
+        async function migrateRides() {
+            log('🔄 Starting migration...', 'info');
+
+            try {
+                const ridesCollection = collection(db, 'rides');
+                const snapshot = await getDocs(ridesCollection);
+
+                log(`📊 Found ${snapshot.size} rides to migrate\n`, 'info');
+
+                let migrated = 0;
+                let skipped = 0;
+                let errors = 0;
+
+                for (const rideDoc of snapshot.docs) {
+                    try {
+                        const data = rideDoc.data();
+                        const rideId = rideDoc.id;
+
+                        log(`🔍 Processing: ${rideId} - "${data.title || 'Untitled'}"`, 'info');
+
+                        const updates = {};
+                        let needsUpdate = false;
+
+                        // 1. Migrate startLocation to GeoPoint
+                        if (data.startLocation) {
+                            if (!(data.startLocation instanceof GeoPoint) && !data.startLocation.latitude) {
+                                const lat = data.startLocation.lat || 0;
+                                const lng = data.startLocation.lng || 0;
+
+                                updates.startLocation = new GeoPoint(Number(lat), Number(lng));
+                                updates.startLocationName = data.startLocation.name || data.startLocationName || '';
+                                updates.startLocationAddress = data.startLocation.address || data.startLocationAddress || '';
+
+                                log(`  ✅ Migrating startLocation: [${lat}, ${lng}]`, 'success');
+                                needsUpdate = true;
+                            } else {
+                                log(`  ⏭️  startLocation already GeoPoint`, 'skip');
+                                // Ensure metadata exists
+                                if (!data.startLocationName) {
+                                    updates.startLocationName = '';
+                                    needsUpdate = true;
+                                }
+                                if (!data.startLocationAddress) {
+                                    updates.startLocationAddress = '';
+                                    needsUpdate = true;
+                                }
+                            }
+                        } else {
+                            log(`  ⚠️  startLocation missing - adding placeholder`, 'warning');
+                            updates.startLocation = new GeoPoint(0, 0);
+                            updates.startLocationName = 'Unknown Location';
+                            updates.startLocationAddress = '';
+                            needsUpdate = true;
+                        }
+
+                        // 2. Migrate or add endLocation
+                        if (data.endLocation) {
+                            if (!(data.endLocation instanceof GeoPoint) && !data.endLocation.latitude) {
+                                const lat = data.endLocation.lat || 0;
+                                const lng = data.endLocation.lng || 0;
+
+                                updates.endLocation = new GeoPoint(Number(lat), Number(lng));
+                                updates.endLocationName = data.endLocation.name || data.endLocationName || '';
+                                updates.endLocationAddress = data.endLocation.address || data.endLocationAddress || '';
+
+                                log(`  ✅ Migrating endLocation: [${lat}, ${lng}]`, 'success');
+                                needsUpdate = true;
+                            } else {
+                                log(`  ⏭️  endLocation already GeoPoint`, 'skip');
+                                if (!data.endLocationName) {
+                                    updates.endLocationName = '';
+                                    needsUpdate = true;
+                                }
+                                if (!data.endLocationAddress) {
+                                    updates.endLocationAddress = '';
+                                    needsUpdate = true;
+                                }
+                            }
+                        } else {
+                            log(`  ⚠️  endLocation missing - adding placeholder`, 'warning');
+                            // Use startLocation as fallback
+                            const startLat = data.startLocation?.latitude || 0;
+                            const startLng = data.startLocation?.longitude || 0;
+                            updates.endLocation = new GeoPoint(Number(startLat), Number(startLng));
+                            updates.endLocationName = 'Destination (TBD)';
+                            updates.endLocationAddress = '';
+                            needsUpdate = true;
+                        }
+
+                        // 3. Remove duplicate hostId (keep organizerId)
+                        if (data.hostId !== undefined && data.organizerId) {
+                            updates.hostId = null; // Set to null to remove
+                            log(`  🗑️  Removing duplicate hostId`, 'success');
+                            needsUpdate = true;
+                        } else if (data.hostId && !data.organizerId) {
+                            updates.organizerId = data.hostId;
+                            updates.hostId = null;
+                            log(`  🔄 Renaming hostId to organizerId`, 'success');
+                            needsUpdate = true;
+                        }
+
+                        // 4. Add description if missing
+                        if (!data.description) {
+                            updates.description = '';
+                            log(`  📝 Adding empty description field`, 'success');
+                            needsUpdate = true;
+                        }
+
+                        // 5. Ensure isPublic exists
+                        if (data.isPublic === undefined) {
+                            updates.isPublic = true;
+                            log(`  🔓 Setting isPublic to true (default)`, 'success');
+                            needsUpdate = true;
+                        }
+
+                        // Apply updates if needed
+                        if (needsUpdate && Object.keys(updates).length > 0) {
+                            const rideRef = doc(db, 'rides', rideId);
+                            await updateDoc(rideRef, updates);
+                            log(`  ✅ Migration complete\n`, 'success');
+                            migrated++;
+                        } else {
+                            log(`  ⏭️  No migration needed\n`, 'skip');
+                            skipped++;
+                        }
+
+                    } catch (error) {
+                        log(`  ❌ Error: ${error.message}\n`, 'error');
+                        errors++;
+                    }
+                }
+
+                log('═'.repeat(60), 'info');
+                log('📊 Migration Summary:', 'info');
+                log(`  ✅ Migrated: ${migrated}`, 'success');
+                log(`  ⏭️  Skipped: ${skipped}`, 'skip');
+                log(`  ❌ Errors: ${errors}`, errors > 0 ? 'error' : 'success');
+                log('═'.repeat(60), 'info');
+
+            } catch (error) {
+                log(`❌ Fatal error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

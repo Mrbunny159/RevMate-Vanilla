@@ -1,0 +1,131 @@
+# 🚀 QUICK SETUP CARD
+**Google Sign-In for Website Wrappers - 30 Minute Setup**
+
+---
+
+## THE PROBLEM
+```
+Website: Google Sign-In ✅
+Wrapper: Google Sign-In ❌ (Error 403)
+Reason: Popup blocked by WebView
+```
+
+## THE SOLUTION
+```
+Automatic detection + External browser for mobile
+Desktop: Popup ✅ | Mobile: System browser ✅
+```
+
+---
+
+## 30-MINUTE SETUP
+
+### Step 1: Firebase (5 min)
+```
+1. Go: https://console.firebase.google.com
+2. Select: avishkar-c9826
+3. Go: Authentication → Settings
+4. Add to Authorized Domains:
+   ✓ avishkar-c9826.firebaseapp.com
+   ✓ avishkar-c9826.web.app
+   ✓ localhost
+5. Save
+```
+
+### Step 2: Google Cloud (5 min)
+```
+1. Go: https://console.cloud.google.com
+2. Go: APIs & Services → Credentials
+3. Click: OAuth 2.0 Client ID (Web)
+4. Add to Authorized Redirect URIs:
+   ✓ https://avishkar-c9826.firebaseapp.com/__/auth/handler
+   ✓ https://avishkar-c9826.web.app/__/auth/handler
+5. Save
+```
+
+### Step 3: Choose Wrapper
+```
+☐ Median.co (easiest) → Read: MEDIAN_SETUP.md
+☐ Capacitor (best) → Read: CAPACITOR_SETUP.md
+☐ Cordova → Read: WEBVIEW_GOOGLE_AUTH_SETUP.md
+☐ Native → Read: WEBVIEW_GOOGLE_AUTH_SETUP.md
+```
+
+### Step 4: Follow Wrapper Guide (10-15 min)
+```
+Read your wrapper's setup guide
+Configure as instructed
+```
+
+### Step 5: Test (2 min)
+```
+Desktop: Click Google Sign-In → Popup appears ✅
+Mobile: Click Google Sign-In → Browser opens ✅
+After sign-in: You're logged in ✅
+```
+
+---
+
+## IF SOMETHING DOESN'T WORK
+
+```
+❌ "403 disallowed_useragent"
+→ Wrapper not configured for external browser
+
+❌ "auth/popup-blocked"
+→ This is OK! Redirect flow triggered
+
+❌ "Invalid redirect_uri"
+→ Add /__/auth/handler to Google Cloud URIs
+
+❌ Blank after sign-in
+→ Domain not in Firebase Authorized Domains
+
+❌ Still confused
+→ Read: QUICK_REFERENCE.md (Troubleshooting)
+```
+
+---
+
+## FILES YOU HAVE
+
+```
+📖 QUICK_REFERENCE.md ← Start here (5 min)
+📖 IMPLEMENTATION_CHECKLIST.md ← Step-by-step (30 min)
+📖 SOLUTION_AT_A_GLANCE.md ← Visual reference (3 min)
+📱 MEDIAN_SETUP.md ← Median users
+🚀 CAPACITOR_SETUP.md ← Capacitor users
+📚 WEBVIEW_GOOGLE_AUTH_SETUP.md ← Full guide
+🔒 FIRESTORE_RULES.txt ← Database security
+📚 DOCUMENTATION_INDEX.md ← Navigation
+```
+
+---
+
+## SUCCESS WHEN
+
+```
+✅ Desktop: Popup dialog works
+✅ Mobile: System browser opens (KEY!)
+✅ After auth: Redirects back to app
+✅ Console: No errors
+✅ User: Name displays correctly
+```
+
+---
+
+## KEY LINKS
+
+```
+Firebase: https://console.firebase.google.com
+Google Cloud: https://console.cloud.google.com
+Median: https://median.co
+Capacitor: https://capacitorjs.com
+```
+
+---
+
+**Next Step**: Open QUICK_REFERENCE.md  
+**Then Do**: Follow IMPLEMENTATION_CHECKLIST.md  
+**Total Time**: 30 minutes  
+**Result**: Google Sign-In working! 🎉
