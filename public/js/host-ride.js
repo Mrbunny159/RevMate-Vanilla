@@ -10,9 +10,16 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getCurrentUserId } from './firebase-auth.js';
+<<<<<<< HEAD
 import { getStartLocation, getEndLocation, onLocationsChanged, ensureMapsReady, initializeMaps } from './maps.js';
 import { saveRide } from './rides.js';
 
+=======
+import { getStartLocation, getEndLocation, ensureMapsReady, initializeMaps } from './maps-leaflet.js';
+import { saveRide } from './rides.js';
+
+
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 // Small HTML-escaped helper
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -61,7 +68,13 @@ function showInlineMessage(message, { type = 'success', targetId = null, timeout
 export async function hostRide() {
   try {
     const titleEl = document.getElementById('rideTitle');
+<<<<<<< HEAD
     const dateEl = document.getElementById('rideDateTime');
+=======
+    const descriptionEl = document.getElementById('rideDescription');
+    const dateEl = document.getElementById('rideDateTime');
+    const isPublicToggle = document.getElementById('isPublicToggle');
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     const startInputEl = document.getElementById('startLocationInput');
     const endInputEl = document.getElementById('endLocationInput');
 
@@ -71,6 +84,11 @@ export async function hostRide() {
     }
 
     const title = titleEl.value?.trim();
+<<<<<<< HEAD
+=======
+    const description = descriptionEl?.value?.trim() || ''; // Optional field
+    const isPublic = isPublicToggle ? isPublicToggle.checked : true; // Default to public
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     const dateValue = dateEl.value; // expected format from datetime-local
     const startLocation = getStartLocation();
     const endLocation = getEndLocation();
@@ -139,6 +157,7 @@ export async function hostRide() {
     // Ensure any maps data is ready (in case maps library hasn't finished loading)
     await ensureMapsReady();
 
+<<<<<<< HEAD
     // Try to read last-calculated distance/duration from DOM (maps.js will update these)
     const distanceText = document.getElementById('distanceText')?.textContent || '';
     const durationText = document.getElementById('durationText')?.textContent || '';
@@ -168,6 +187,30 @@ export async function hostRide() {
         lat: Number(endLocation.lat),
         lng: Number(endLocation.lng)
       },
+=======
+    // Try to read last-calculated distance/duration from DOM (maps-leaflet.js will update these)
+    const lastRoute = window.__lastRoute || null;
+    const distanceKm = lastRoute?.distanceKm ?? null;
+    const durationMinutes = lastRoute?.durationMinutes ?? null;
+
+    // NEW DATA STRUCTURE with proper GeoPoint and metadata
+    const rideToSave = {
+      title,
+      description,  // NEW: Optional description field
+      rideDateTime: new Date(dateValue),
+      isPublic,  // NEW: Read from toggle instead of hardcoded
+      organizerId: organizerId,  // Consolidated (removed hostId)
+      participants: [organizerId],
+      requests: [],
+      // GeoPoint for startLocation
+      startLocation: new GeoPoint(Number(startLocation.lat), Number(startLocation.lng)),
+      startLocationName: startLocation.name || '',
+      startLocationAddress: startLocation.address || '',
+      // GeoPoint for endLocation  
+      endLocation: new GeoPoint(Number(endLocation.lat), Number(endLocation.lng)),
+      endLocationName: endLocation.name || '',
+      endLocationAddress: endLocation.address || '',
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
       distanceKm: distanceKm ?? null,
       durationMinutes: durationMinutes ?? null,
       createdAt: serverTimestamp()

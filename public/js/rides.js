@@ -169,6 +169,7 @@ export function renderDiscoverRides(rides = []) {
   if (!container) return;
 
   if (!rides || rides.length === 0) {
+<<<<<<< HEAD
     container.innerHTML = `
       <div class="col-12">
         <div class="empty-state-container">
@@ -177,6 +178,27 @@ export function renderDiscoverRides(rides = []) {
         </div>
       </div>
     `;
+=======
+    // Use enhanced empty state
+    container.innerHTML = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'col-12';
+    container.appendChild(wrapper);
+
+    import('./utils/ux-helpers.js').then(({ renderEmptyState }) => {
+      renderEmptyState(wrapper, {
+        icon: 'bi-geo-alt',
+        title: 'No rides available',
+        message: 'Be the first to host a ride and start your adventure! Create a new ride to get started.',
+        actionText: 'Host a Ride',
+        actionIcon: 'bi-plus-circle',
+        actionCallback: () => {
+          document.getElementById('nav-host').click();
+        },
+        variant: 'rides'
+      });
+    });
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     return;
   }
 
@@ -190,6 +212,13 @@ export function renderDiscoverRides(rides = []) {
     const buttonLabel = isJoined ? '✓ Joined' : '+ Join Ride';
     const buttonIcon = isJoined ? 'bi-check-circle-fill' : 'bi-plus-circle';
 
+<<<<<<< HEAD
+=======
+    // Truncate description to 150 characters
+    const description = ride.description || '';
+    const truncatedDesc = description.length > 150 ? description.substring(0, 150) + '...' : description;
+
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     return `
       <div class="col-md-6 col-lg-4">
         <div class="ride-card">
@@ -198,6 +227,13 @@ export function renderDiscoverRides(rides = []) {
             <span class="badge badge-public">Public</span>
           </div>
           
+<<<<<<< HEAD
+=======
+          ${description ? `<div class="ride-description">
+            <p>${escapeHtml(truncatedDesc)}</p>
+          </div>` : ''}
+          
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
           <div class="ride-card-body">
             <div class="ride-info-row">
               <i class="bi bi-calendar-event ride-icon"></i>

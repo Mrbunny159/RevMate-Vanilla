@@ -31,7 +31,12 @@ try {
     logWebViewDebug = () => { };
 }
 
+<<<<<<< HEAD
 import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+=======
+import { doc, setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+import { createUniqueUsername } from './utils/username-generator.js';
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
 /**
  * Register a new user with email and password
@@ -46,12 +51,40 @@ export async function registerUser(email, password, name) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+<<<<<<< HEAD
         // Create user document in Firestore
         await setDoc(doc(db, 'users', user.uid), {
             id: user.uid,
             name: name,
             email: email,
             createdAt: new Date(),
+=======
+        // Generate unique username from email
+        const username = await createUniqueUsername(email, db);
+        console.log(`✅ Generated username: ${username} for ${email}`);
+
+        // Create expanded user document in Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+            uid: user.uid,
+            id: user.uid, // Legacy compatibility
+            email: email,
+            username: username,  // NEW: Permanent unique username
+            displayName: name,
+            photoURL: null,
+            bio: '',
+            bike: '',
+            city: '',
+            privacySettings: {
+                profilePublic: true,
+                hideJoinedRides: false
+            },
+            stats: {
+                ridesHosted: 0,
+                ridesJoined: 0
+            },
+            createdAt: serverTimestamp(),
+            lastActive: serverTimestamp(),
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
             following: []
         });
 
@@ -59,11 +92,19 @@ export async function registerUser(email, password, name) {
             success: true,
             user: {
                 id: user.uid,
+<<<<<<< HEAD
+=======
+                username: username,
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 name: name,
                 email: email
             }
         };
     } catch (error) {
+<<<<<<< HEAD
+=======
+        console.error('Registration error:', error);
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         return {
             success: false,
             error: error.message
@@ -254,6 +295,7 @@ export async function loginWithGoogle() {
         if (!userDoc.exists()) {
             // Create user document if it's a new user
             logWebViewDebug('CREATE_FIRESTORE_DOC', { uid: user.uid });
+<<<<<<< HEAD
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: user.displayName || 'User',
@@ -261,6 +303,33 @@ export async function loginWithGoogle() {
                 photoURL: user.photoURL || null,
                 authProvider: 'google',
                 createdAt: new Date(),
+=======
+
+            // Generate unique username
+            const username = await createUniqueUsername(user.email, db);
+
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                id: user.uid,
+                email: user.email,
+                username: username,
+                displayName: user.displayName || 'User',
+                photoURL: user.photoURL || null,
+                bio: '',
+                bike: '',
+                city: '',
+                privacySettings: {
+                    profilePublic: true,
+                    hideJoinedRides: false
+                },
+                stats: {
+                    ridesHosted: 0,
+                    ridesJoined: 0
+                },
+                authProvider: 'google',
+                createdAt: serverTimestamp(),
+                lastActive: serverTimestamp(),
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 following: []
             });
         }
@@ -380,6 +449,7 @@ export async function loginWithApple() {
 
         if (!userDoc.exists()) {
             // Create user document if it's a new user
+<<<<<<< HEAD
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: user.displayName || 'Apple User',
@@ -387,6 +457,33 @@ export async function loginWithApple() {
                 photoURL: user.photoURL || null,
                 authProvider: 'apple',
                 createdAt: new Date(),
+=======
+
+            // Generate unique username
+            const username = await createUniqueUsername(user.email, db);
+
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                id: user.uid,
+                email: user.email,
+                username: username,
+                displayName: user.displayName || 'Apple User',
+                photoURL: user.photoURL || null,
+                bio: '',
+                bike: '',
+                city: '',
+                privacySettings: {
+                    profilePublic: true,
+                    hideJoinedRides: false
+                },
+                stats: {
+                    ridesHosted: 0,
+                    ridesJoined: 0
+                },
+                authProvider: 'apple',
+                createdAt: serverTimestamp(),
+                lastActive: serverTimestamp(),
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 following: []
             });
         }
@@ -476,6 +573,7 @@ export async function verifyPhoneCode(confirmationResult, code, name = 'Phone Us
 
         if (!userDoc.exists()) {
             // Create user document if it's a new user
+<<<<<<< HEAD
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: name,
@@ -484,6 +582,35 @@ export async function verifyPhoneCode(confirmationResult, code, name = 'Phone Us
                 photoURL: user.photoURL || null,
                 authProvider: 'phone',
                 createdAt: new Date(),
+=======
+
+            // Generate username from phone or use fallback
+            const emailForUsername = user.email || `user${user.phoneNumber.replace(/[^0-9]/g, '')}@phone.local`;
+            const username = await createUniqueUsername(emailForUsername, db);
+
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                id: user.uid,
+                email: user.email || '',
+                username: username,
+                displayName: name,
+                phoneNumber: user.phoneNumber,
+                photoURL: user.photoURL || null,
+                bio: '',
+                bike: '',
+                city: '',
+                privacySettings: {
+                    profilePublic: true,
+                    hideJoinedRides: false
+                },
+                stats: {
+                    ridesHosted: 0,
+                    ridesJoined: 0
+                },
+                authProvider: 'phone',
+                createdAt: serverTimestamp(),
+                lastActive: serverTimestamp(),
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 following: []
             });
         }

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RevMate - Ride Together</title>
 
+<<<<<<< HEAD
 
   <link rel="icon" type="image/png" href="/icons/app.png">
   <link rel="icon" href="/icons/icon-192.png">
@@ -40,6 +41,8 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json">
 
+=======
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
@@ -57,7 +60,74 @@
   <!-- External Stylesheets -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/rides.css">
+<<<<<<< HEAD
   <link rel="stylesheet" href="css/theme.css">
+=======
+  <link rel="stylesheet" href="css/filters.css">
+  <link rel="stylesheet" href="css/community.css">
+  <link rel="stylesheet" href="css/follow-system.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/ux-improvements.css">
+
+  <!-- Critical CSS - Prevents FOUC -->
+  <style>
+    /* Hide body until theme loads */
+    body {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    /* Critical theme variables */
+    :root {
+      --primary: #A8DADC;
+      --secondary: #F8E8E8;
+      --accent: #CDB4DB;
+      --text-dark: #2c3e50;
+      --text-muted: #7f8c8d;
+    }
+
+    .dark-mode {
+      --text-dark: #ecf0f1;
+      --text-muted: #95a5a6;
+    }
+  </style>
+
+  <!-- Theme Preload Script - Must run BEFORE body renders -->
+  <script>
+    (function () {
+      // Apply saved theme immediately to prevent flash
+      try {
+        const themeSettings = localStorage.getItem('themeSettings');
+        if (themeSettings) {
+          const settings = JSON.parse(themeSettings);
+
+          // Apply theme
+          if (settings.theme) {
+            document.documentElement.classList.add(`theme-${settings.theme}`);
+          }
+
+          // Apply dark mode
+          if (settings.darkMode) {
+            document.body.classList.add('dark-mode');
+          }
+        }
+      } catch (e) {
+        console.warn('Theme preload failed:', e);
+      }
+
+      // Mark body as loaded after a tiny delay
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          document.body.classList.add('loaded');
+        }, 50);
+      });
+    })();
+  </script>
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
   <!-- Service Worker Registration -->
   <script>
@@ -282,6 +352,7 @@
           <h2>Discover Rides 🗺️</h2>
           <p>Find your next adventure</p>
         </div>
+<<<<<<< HEAD
         <div style="display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:14px;">
           <label for="radiusSelect" style="margin:0;font-weight:600;color:#444;">Radius:</label>
           <select id="radiusSelect">
@@ -290,6 +361,24 @@
             <option value="25">25 km</option>
             <option value="50">50 km</option>
           </select>
+=======
+
+        <!-- Radius Filter with Chip Buttons -->
+        <div class="radius-filter-container">
+          <div class="radius-filter-header">
+            <label for="radiusChips" class="filter-label">
+              <i class="bi bi-radar"></i> Radius:
+            </label>
+            <p class="radius-display">Showing rides within <strong id="currentRadiusText">25 km</strong></p>
+          </div>
+          <div class="radius-chips" id="radiusChips">
+            <button class="chip-btn" data-radius="5">5 km</button>
+            <button class="chip-btn" data-radius="10">10 km</button>
+            <button class="chip-btn active" data-radius="25">25 km</button>
+            <button class="chip-btn" data-radius="50">50 km</button>
+            <button class="chip-btn" data-radius="100">100 km</button>
+          </div>
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         </div>
 
         <div id="discoverRides" class="row g-3"></div>
@@ -317,6 +406,20 @@
             </div>
 
             <div class="mb-3">
+<<<<<<< HEAD
+=======
+              <label for="rideDescription" class="form-label">Description <span
+                  class="text-muted">(Optional)</span></label>
+              <textarea id="rideDescription" class="form-control" rows="3" maxlength="500"
+                placeholder="Describe your ride - route details, stops, riding style..."></textarea>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">Help riders know what to expect</small>
+                <small class="text-muted" id="descriptionCounter">0/500</small>
+              </div>
+            </div>
+
+            <div class="mb-3">
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
               <label for="rideDateTime" class="form-label">Date & Time</label>
               <input type="datetime-local" id="rideDateTime" class="form-control" required>
             </div>
@@ -347,6 +450,21 @@
                 </div>
               </div>
 
+<<<<<<< HEAD
+=======
+              <div class="mb-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="isPublicToggle" checked>
+                  <label class="form-check-label" for="isPublicToggle">
+                    <strong>Public Ride</strong> <span class="text-muted">- Visible to all riders</span>
+                  </label>
+                </div>
+                <small class="text-muted d-block mt-1">
+                  <i class="bi bi-info-circle"></i> Private rides are only visible to invited riders (coming soon)
+                </small>
+              </div>
+
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
               <div class="d-grid">
                 <button id="hostRideBtn" type="button" class="btn btn-host w-100">
                   <i class="bi bi-plus-circle me-2"></i>Host Ride
@@ -382,11 +500,62 @@
     <section id="community" class="app-section">
       <div class="container">
         <div class="section-header">
+<<<<<<< HEAD
           <h2>Community 👥</h2>
           <p>Connect with riders</p>
         </div>
 
         <div id="communityList" class="community-list"></div>
+=======
+          <h2>Community 🤝</h2>
+          <p>Connect with fellow riders</p>
+        </div>
+
+        <!-- Community Filters -->
+        <div class="community-filters-container">
+          <div class="community-filters-header">
+            <i class="bi bi-funnel"></i> Filter Community
+          </div>
+          <div class="filters-grid">
+            <div class="filter-group">
+              <label>City</label>
+              <select id="filterCity">
+                <option value="all">All Cities</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Bike</label>
+              <select id="filterBike">
+                <option value="all">All Bikes</option>
+                <option value="royal enfield">Royal Enfield</option>
+                <option value="ktm">KTM</option>
+                <option value="yamaha">Yamaha</option>
+                <option value="bmw">BMW</option>
+                <option value="bajaj">Bajaj</option>
+                <option value="honda">Honda</option>
+                <option value="kawasaki">Kawasaki</option>
+                <option value="triumph">Triumph</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Activity</label>
+              <select id="filterActivity">
+                <option value="all">All Users</option>
+                <option value="week">Active in 7 days</option>
+                <option value="month">Active in 30 days</option>
+              </select>
+            </div>
+            <div class="filter-group" style="display: flex; align-items: flex-end;">
+              <button id="resetFilters" class="btn-reset-filters">
+                <i class="bi bi-arrow-clockwise"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Community List -->
+        <div id="community-list"></div>
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
         <div id="community-empty-state" class="placeholder-content hidden">
           <i class="bi bi-people" style="font-size: 4rem; color: var(--primary);"></i>
@@ -395,6 +564,16 @@
       </div>
     </section>
 
+<<<<<<< HEAD
+=======
+    <!-- User Profile Section (Dynamic - loaded by router) -->
+    <section id="user-profile" class="app-section">
+      <div class="container">
+        <div id="profile-content"></div>
+      </div>
+    </section>
+
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     <!-- Profile Section (PHASE 5) -->
     <section id="profile" class="app-section">
       <div class="container">
@@ -512,9 +691,16 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
   <!-- Google Maps API - async and defer for optimal loading -->
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly"></script>
+=======
+
+  <!-- Leaflet CSS and JS for OpenStreetMap -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
   <script type="module" src="js/script.js"></script>
 </body>

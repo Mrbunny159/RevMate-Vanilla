@@ -1,0 +1,194 @@
+/* ============================================
+   RADIUS FILTER - CHIP BUTTONS
+   Material Design Style
+   ============================================ */
+
+.radius-filter-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e8e8e8;
+}
+
+.dark-mode .radius-filter-container {
+    background: #2a2a2a;
+    border-color: #4a4a4a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.radius-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filter-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark, #2c3e50);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.filter-label i {
+    font-size: 1.1rem;
+    color: var(--accent, #CDB4DB);
+}
+
+.radius-display {
+    font-size: 0.9rem;
+    color: var(--text-muted, #7f8c8d);
+    margin: 0;
+}
+
+.radius-display strong {
+    color: var(--accent, #CDB4DB);
+    font-weight: 600;
+}
+
+/* Chip Buttons Container */
+.radius-chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Individual Chip Button */
+.chip-btn {
+    padding: 10px 20px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ripple Effect */
+.chip-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(205, 180, 219, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.chip-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Hover State */
+.chip-btn:hover {
+    border-color: var(--accent, #CDB4DB);
+    background: rgba(205, 180, 219, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(205, 180, 219, 0.2);
+}
+
+/* Active/Selected State */
+.chip-btn.active {
+    background: linear-gradient(135deg, var(--primary, #A8DADC), var(--accent, #CDB4DB));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(205, 180, 219, 0.4);
+    font-weight: 700;
+}
+
+.chip-btn.active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(205, 180, 219, 0.5);
+}
+
+/* Focus State (Accessibility) */
+.chip-btn:focus {
+    outline: 3px solid rgba(205, 180, 219, 0.3);
+    outline-offset: 2px;
+}
+
+/* Dark Mode */
+.dark-mode .chip-btn {
+    background: #3a3a3a;
+    border-color: #555;
+    color: #ddd;
+}
+
+.dark-mode .chip-btn:hover {
+    background: #4a4a4a;
+    border-color: var(--accent, #CDB4DB);
+}
+
+.dark-mode .chip-btn.active {
+    background: linear-gradient(135deg, var(--primary, #A8DADC), var(--accent, #CDB4DB));
+    color: white;
+    border-color: transparent;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .radius-filter-container {
+        padding: 16px;
+    }
+
+    .radius-filter-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .radius-chips {
+        width: 100%;
+    }
+
+    .chip-btn {
+        flex: 1;
+        min-width: 80px;
+        text-align: center;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .radius-chips {
+        gap: 8px;
+    }
+
+    .chip-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Animation */
+@keyframes chipPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.chip-btn.active {
+    animation: chipPulse 0.3s ease;
+}

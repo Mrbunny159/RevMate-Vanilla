@@ -1,0 +1,391 @@
+/* ============================================
+   ERROR HANDLING & TOAST NOTIFICATIONS
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+}
+
+.toast {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+    border-left: 4px solid;
+}
+
+.toast.success {
+    border-color: #27ae60;
+}
+
+.toast.error {
+    border-color: #e74c3c;
+}
+
+.toast.warning {
+    border-color: #f39c12;
+}
+
+.toast.info {
+    border-color: #3498db;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.toast.success .toast-icon {
+    color: #27ae60;
+}
+
+.toast.error .toast-icon {
+    color: #e74c3c;
+}
+
+.toast.warning .toast-icon {
+    color: #f39c12;
+}
+
+.toast.info .toast-icon {
+    color: #3498db;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.toast-message {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: #95a5a6;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.toast-close:hover {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   ENHANCED EMPTY STATES
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+.empty-state-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: white;
+    opacity: 0.9;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark, #2c3e50);
+    margin: 0 0 12px 0;
+}
+
+.empty-state-message {
+    font-size: 1rem;
+    color: var(--text-muted, #7f8c8d);
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+}
+
+.empty-state-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+.empty-state-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state-action i {
+    font-size: 1.1rem;
+}
+
+/* Specific empty state variations */
+.empty-state.rides {
+    .empty-state-icon {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+}
+
+.empty-state.community {
+    .empty-state-icon {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+}
+
+.empty-state.search {
+    .empty-state-icon {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+}
+
+/* ============================================
+   LOADING SKELETONS
+   ============================================ */
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-title {
+    width: 70%;
+    height: 24px;
+    margin-bottom: 16px;
+}
+
+.skeleton-text {
+    width: 100%;
+    height: 16px;
+    margin-bottom: 12px;
+}
+
+.skeleton-text.short {
+    width: 50%;
+}
+
+.skeleton-button {
+    width: 120px;
+    height: 40px;
+    margin-top: 16px;
+}
+
+/* ============================================
+   THEME LOADING (FOUC FIX)
+   ============================================ */
+
+/* Hide body until theme is loaded */
+body.loading {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+body.loaded {
+    opacity: 1;
+}
+
+/* Critical CSS - inline this in <head> for instant load */
+:root {
+    --primary: #A8DADC;
+    --secondary: #F8E8E8;
+    --accent: #CDB4DB;
+    --text-dark: #2c3e50;
+    --text-muted: #7f8c8d;
+}
+
+/* Dark mode theme variables */
+.dark-mode {
+    --text-dark: #ecf0f1;
+    --text-muted: #95a5a6;
+}
+
+/* ============================================
+   ERROR BOUNDARY
+   ============================================ */
+
+.error-boundary {
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.error-boundary-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.error-boundary-icon {
+    font-size: 5rem;
+    color: #e74c3c;
+    margin-bottom: 24px;
+}
+
+.error-boundary-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 12px 0;
+}
+
+.error-boundary-message {
+    font-size: 1rem;
+    color: #7f8c8d;
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+}
+
+.error-boundary-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.error-boundary-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.error-boundary-button.primary {
+    background: #3498db;
+    color: white;
+}
+
+.error-boundary-button.primary:hover {
+    background: #2980b9;
+}
+
+.error-boundary-button.secondary {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.error-boundary-button.secondary:hover {
+    background: #bdc3c7;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .toast-container {
+        left: 16px;
+        right: 16px;
+        top: 16px;
+        max-width: none;
+    }
+
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 3rem;
+    }
+
+    .empty-state-title {
+        font-size: 1.25rem;
+    }
+
+    .empty-state-message {
+        font-size: 0.9375rem;
+    }
+}

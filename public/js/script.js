@@ -50,6 +50,12 @@ import {
 import { renderDiscoverRides } from './rides.js';
 import { haversineDistanceKm } from './utils/distance.js';
 
+<<<<<<< HEAD
+=======
+// Import UX helpers
+import { showToast, showSuccess, showError, showWarning, showInfo, renderEmptyState, showLoadingSkeleton } from './utils/ux-helpers.js';
+
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 // Host ride module (wires host button + load/refresh)
 import './host-ride.js';
 
@@ -70,6 +76,7 @@ function saveData(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
+<<<<<<< HEAD
 function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
     if (!alertContainer) return;
@@ -99,6 +106,23 @@ function showRideAlert(message) {
         alert.style.animation = 'fadeOut 0.3s ease';
         setTimeout(() => alert.remove(), 300);
     }, 2500);
+=======
+// Use new toast system instead of old alerts
+function showAlert(message, type = 'success') {
+    if (type === 'danger' || type === 'error') {
+        showError(message);
+    } else if (type === 'warning') {
+        showWarning(message);
+    } else if (type === 'info') {
+        showInfo(message);
+    } else {
+        showSuccess(message);
+    }
+}
+
+function showRideAlert(message, type = 'success') {
+    showAlert(message, type);
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 }
 
 // ============================================
@@ -407,6 +431,7 @@ function formatDate(dateString) {
 async function loadDiscoverRides() {
     // Start real-time listener for public rides with radius filtering
     let userLocation = null;
+<<<<<<< HEAD
     const radiusSelect = document.getElementById('radiusSelect');
     let cachedRides = [];
 
@@ -433,15 +458,85 @@ async function loadDiscoverRides() {
             if (lat == null || lng == null) return false;
             const d = haversineDistanceKm(userLocation.lat, userLocation.lng, Number(lat), Number(lng));
             return d <= radiusKm;
+=======
+    let currentRadius = 25; // Default radius in km
+    let cachedRides = [];
+
+    // Try to get user's current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                console.log('📍 User location obtained:', userLocation);
+                filterAndRender(cachedRides);
+            },
+            (error) => {
+                console.warn('⚠️ Geolocation not available:', error.message);
+            }
+        );
+    }
+
+    function filterAndRender(rides) {
+        if (!userLocation || !rides) {
+            renderDiscoverRides(rides || []);
+            return;
+        }
+
+        const filtered = rides.filter(ride => {
+            if (!ride.startLocation?.latitude || !ride.startLocation?.longitude) {
+                return true;
+            }
+
+            const distance = haversineDistanceKm(
+                userLocation.lat,
+                userLocation.lng,
+                ride.startLocation.latitude,
+                ride.startLocation.longitude
+            );
+
+            return distance <= currentRadius;
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         });
 
         renderDiscoverRides(filtered);
     }
 
+<<<<<<< HEAD
     // Re-run filter when radius changes
     if (radiusSelect) {
         radiusSelect.addEventListener('change', () => { filterAndRender(cachedRides); });
     }
+=======
+    // Setup radius chip button handlers
+    const chipButtons = document.querySelectorAll('.chip-btn[data-radius]');
+    const radiusDisplayText = document.getElementById('currentRadiusText');
+
+    chipButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all chips
+            chipButtons.forEach(chip => chip.classList.remove('active'));
+
+            // Add active class to clicked chip
+            btn.classList.add('active');
+
+            // Update current radius
+            currentRadius = Number(btn.getAttribute('data-radius'));
+
+            // Update display text
+            if (radiusDisplayText) {
+                radiusDisplayText.textContent = `${currentRadius} km`;
+            }
+
+            // Re-filter and render
+            filterAndRender(cachedRides);
+
+            console.log(`📏 Radius updated to: ${currentRadius} km`);
+        });
+    });
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
     // Start listener with callback to receive all rides and then filter
     startDiscoverListener((rides) => {
@@ -458,6 +553,60 @@ async function refreshDiscoverRides() {
     console.log('ℹ️ Discover rides are syncing in real-time');
 }
 
+<<<<<<< HEAD
+=======
+function initNavigation() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Remove active class from all nav items and sections
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelectorAll('.app-section').forEach(section => section.classList.remove('active'));
+
+            // Add active class to clicked nav item
+            item.classList.add('active');
+
+            // Show corresponding section
+            const targetSection = item.getAttribute('data-section');
+            const section = document.getElementById(targetSection);
+
+            if (section) {
+                section.classList.add('active');
+
+                // Save last viewed section
+                try {
+                    localStorage.setItem('lastSection', targetSection);
+                } catch (e) {
+                    console.warn('Could not save last section:', e);
+                }
+
+                // Load data for specific sections
+                if (targetSection === 'discover') {
+                    loadDiscoverRides();
+                } else if (targetSection === 'myrides') {
+                    renderMyRides('hosted');
+                } else if (targetSection === 'community') {
+                    // Initialize community when section is shown
+                    initCommunity();
+                }
+            }
+        });
+    });
+
+    // Restore last viewed section or default to 'discover'
+    try {
+        const lastSection = localStorage.getItem('lastSection') || 'discover';
+        const targetNav = document.querySelector(`[data-section="${lastSection}"]`);
+        if (targetNav) {
+            targetNav.click();
+        }
+    } catch (e) {
+        console.warn('Could not restore last section:', e);
+    }
+}
+
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 function initHostRideForm() {
     const hostForm = document.getElementById('hostRideForm');
 
@@ -574,6 +723,7 @@ function initMyRidesTabs() {
 }
 
 // ============================================
+<<<<<<< HEAD
 // COMMUNITY
 // ============================================
 
@@ -711,6 +861,55 @@ function followMember(memberId) {
     saveData('currentUser', currentUser);
     renderCommunity();
     showRideAlert(`Now following ${member.name}!`);
+=======
+// COMMUNITY (Real-time Firestore Integration)
+// ============================================
+
+import { startCommunityListener, stopCommunityListener, updateFilters, getUniqueCities } from './community.js';
+
+function initCommunity() {
+    // Start real-time listener for community
+    startCommunityListener();
+
+    // Setup filter handlers
+    const filterCity = document.getElementById('filterCity');
+    const filterBike = document.getElementById('filterBike');
+    const filterActivity = document.getElementById('filterActivity');
+    const resetBtn = document.getElementById('resetFilters');
+
+    // City filter change
+    if (filterCity) {
+        filterCity.addEventListener('change', () => {
+            updateFilters({ city: filterCity.value });
+        });
+    }
+
+    // Bike filter change
+    if (filterBike) {
+        filterBike.addEventListener('change', () => {
+            updateFilters({ bike: filterBike.value });
+        });
+    }
+
+    // Activity filter change
+    if (filterActivity) {
+        filterActivity.addEventListener('change', () => {
+            updateFilters({ activity: filterActivity.value });
+        });
+    }
+
+    // Reset filters
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (filterCity) filterCity.value = 'all';
+            if (filterBike) filterBike.value = 'all';
+            if (filterActivity) filterActivity.value = 'all';
+            updateFilters({ city: 'all', bike: 'all', activity: 'all' });
+        });
+    }
+
+    console.log('✅ Community initialized');
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 }
 
 // ============================================
@@ -759,6 +958,7 @@ function toggleAuthMode() {
 }
 
 // ============================================
+<<<<<<< HEAD
 // SIGNUP LOGIC
 // ============================================
 
@@ -822,6 +1022,77 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 document.addEventListener('click', async (e) => {
     // Google login button - use hybrid popup/redirect flow
     if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')) {
+=======
+// AUTH EVENT LISTENERS (Initialized on DOM Ready)
+// ============================================
+
+function initAuthEventListeners() {
+    // SIGNUP LOGIC
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm && !signupForm.__listenerAdded) {
+        signupForm.__listenerAdded = true;
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+
+            if (!name || !email || !password) {
+                showAlert('Please fill in all fields', 'danger');
+                return;
+            }
+
+            const result = await registerUser(email, password, name);
+
+            if (result.success) {
+                showAlert('Account created successfully!', 'success');
+
+                setTimeout(() => {
+                    redirectToApp();
+                }, 1000);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        });
+    }
+
+    // LOGIN LOGIC
+    const loginForm = document.getElementById('login-form');
+    if (loginForm && !loginForm.__listenerAdded) {
+        loginForm.__listenerAdded = true;
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!email || !password) {
+                showAlert('Please fill in all fields', 'danger');
+                return;
+            }
+
+            const result = await loginUser(email, password);
+
+            if (result.success) {
+                showAlert('Login successful!', 'success');
+
+                setTimeout(() => {
+                    redirectToApp();
+                }, 800);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        });
+    }
+
+    // SOCIAL LOGIN & SIGNUP BUTTONS (Event Delegation)
+    if (!document.__authClickListenerAdded) {
+        document.__authClickListenerAdded = true;
+        document.addEventListener('click', async (e) => {
+            // Google login button - use hybrid popup/redirect flow
+            if (e.target.closest('#login-google') || e.target.id === 'login-google' || e.target.closest('button[id="login-google"]')) {
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         console.log('🔐 Google Login clicked');
         e.preventDefault();
         e.stopPropagation();
@@ -952,13 +1223,21 @@ document.addEventListener('click', async (e) => {
             showAlert('Error: ' + err.message, 'danger');
         }
         return;
+<<<<<<< HEAD
     }
 });
+=======
+            }
+        });
+    }
+}
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
 // ============================================
 // PHONE LOGIN - TOGGLE FORMS
 // ============================================
 
+<<<<<<< HEAD
 const togglePhoneLoginBtn = document.getElementById('toggle-phone-login');
 const togglePhoneBackBtn = document.getElementById('toggle-phone-back');
 const phoneLoginForm = document.getElementById('phone-login-form');
@@ -991,6 +1270,38 @@ if (togglePhoneBackBtn) {
 
 if (phoneLoginForm) {
     phoneLoginForm.addEventListener('submit', async (e) => {
+=======
+function initPhoneLoginHandlers() {
+    const togglePhoneLoginBtn = document.getElementById('toggle-phone-login');
+    const togglePhoneBackBtn = document.getElementById('toggle-phone-back');
+    const phoneLoginForm = document.getElementById('phone-login-form');
+    const phoneVerifyForm = document.getElementById('phone-verify-form');
+
+    if (togglePhoneLoginBtn) {
+        togglePhoneLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (phoneLoginForm) {
+                phoneLoginForm.classList.remove('hidden');
+                togglePhoneLoginBtn.parentElement.classList.add('hidden');
+            }
+        });
+    }
+
+    if (togglePhoneBackBtn) {
+        togglePhoneBackBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (phoneLoginForm) {
+                phoneLoginForm.classList.add('hidden');
+                togglePhoneLoginBtn.parentElement.classList.remove('hidden');
+                document.getElementById('phone-verify-form')?.classList.add('hidden');
+            }
+        });
+    }
+
+    // PHONE LOGIN - SEND CODE
+    if (phoneLoginForm) {
+        phoneLoginForm.addEventListener('submit', async (e) => {
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         e.preventDefault();
 
         const phoneNumber = document.getElementById('phone-number').value.trim();
@@ -1023,6 +1334,7 @@ if (phoneLoginForm) {
         } catch (error) {
             showAlert(error.message, 'danger');
         }
+<<<<<<< HEAD
     });
 }
 
@@ -1059,6 +1371,42 @@ if (phoneVerifyForm) {
             showAlert(result.error, 'danger');
         }
     });
+=======
+        });
+    }
+
+    // PHONE LOGIN - VERIFY CODE
+    if (phoneVerifyForm) {
+        phoneVerifyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const verificationCode = document.getElementById('verification-code').value.trim();
+            const phoneName = document.getElementById('phone-name').value.trim() || 'Phone User';
+
+            if (!verificationCode) {
+                showAlert('Please enter the verification code', 'danger');
+                return;
+            }
+
+            if (!confirmationResult) {
+                showAlert('Please request a verification code first', 'danger');
+                return;
+            }
+
+            const result = await verifyPhoneCode(confirmationResult, verificationCode, phoneName);
+
+            if (result.success) {
+                showAlert('Login successful!', 'success');
+
+                setTimeout(() => {
+                    redirectToApp();
+                }, 800);
+            } else {
+                showAlert(result.error, 'danger');
+            }
+        });
+    }
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 }
 
 // ============================================
@@ -1133,6 +1481,7 @@ function showSection(sectionId) {
     }
 }
 
+<<<<<<< HEAD
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
 
@@ -1163,6 +1512,8 @@ function initNavigation() {
     }
 }
 
+=======
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 // ============================================
 // LOGOUT LOGIC (PHASE 5)
 // ============================================
@@ -1349,10 +1700,71 @@ window.addEventListener('load', () => {
     applySavedTheme();
     // Initialize PWA install prompt
     initInstallPrompt();
+<<<<<<< HEAD
 });
 
 // Run initialization
 initApp();
+=======
+
+    // Initialize description character counter
+    initDescriptionCounter();
+});
+
+// ============================================
+// DESCRIPTION CHARACTER COUNTER
+// ============================================
+
+function initDescriptionCounter() {
+    const descriptionEl = document.getElementById('rideDescription');
+    const counterEl = document.getElementById('descriptionCounter');
+
+    if (!descriptionEl || !counterEl) return;
+
+    // Update counter on input
+    descriptionEl.addEventListener('input', () => {
+        const length = descriptionEl.value.length;
+        const maxLength = descriptionEl.maxLength || 500;
+        counterEl.textContent = `${length}/${maxLength}`;
+
+        // Change color when approaching limit
+        if (length > maxLength * 0.9) {
+            counterEl.style.color = '#dc3545'; // Red
+        } else if (length > maxLength * 0.7) {
+            counterEl.style.color = '#ffc107'; // Yellow
+        } else {
+            counterEl.style.color = '#6c757d'; // Grey
+        }
+    });
+}
+
+// Run initialization - wrap in DOMContentLoaded to ensure DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    // DOM is already ready
+    initializeApp();
+}
+
+function initializeApp() {
+    console.log('✅ Initializing app - DOM is ready');
+    
+    // Initialize auth event listeners
+    initAuthEventListeners();
+    
+    // Initialize phone login handlers
+    initPhoneLoginHandlers();
+    
+    // Initialize switch link
+    const switchLink = document.getElementById('switch-link');
+    if (switchLink) {
+        switchLink.addEventListener('click', toggleAuthMode);
+    }
+    
+    // Run main app initialization
+    initApp();
+}
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
 // ============================================
 // END OF SCRIPT

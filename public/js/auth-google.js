@@ -27,8 +27,16 @@ import {
 import {
   doc,
   setDoc,
+<<<<<<< HEAD
   getDoc
 } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+=======
+  getDoc,
+  updateDoc,
+  serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+import { createUniqueUsername } from './utils/username-generator.js';
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 import {
   isEmbeddedWebView,
   getWrapperType,
@@ -108,6 +116,7 @@ function getUserFriendlyError(errorCode, fallbackMessage = 'An unexpected error 
 // ============================================
 
 /**
+<<<<<<< HEAD
  * Initialize Google Sign-In with hybrid popup/redirect flow
  * 
  * Flow:
@@ -117,11 +126,156 @@ function getUserFriendlyError(errorCode, fallbackMessage = 'An unexpected error 
  *   4. If popup blocked: fallback to signInWithRedirect
  *   5. On success: create/update Firestore user doc
  *   6. Return user data or error
+=======
+ * Initialize Google Sign-In with better error handling
+ * Desktop-only, simple popup flow
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
  * 
  * @returns {Promise<{success: boolean, user?: Object, error?: string, code?: string}>}
  */
 export async function googleLogin() {
   try {
+<<<<<<< HEAD
+=======
+    console.log('🔐 Google Login initiated');
+    
+    const provider = new GoogleAuthProvider();
+    
+    // Configure provider
+    provider.addScope('email');
+    provider.addScope('profile');
+    provider.setCustomParameters({
+      'prompt': 'select_account',  // User chooses account
+      'access_type': 'offline'
+    });
+
+    console.log('📱 Attempting popup flow...');
+    
+    let result;
+    try {
+      // Try popup first (desktop browsers)
+      result = await signInWithPopup(auth, provider);
+      console.log('✅ Popup successful');
+    } catch (popupError) {
+      console.warn('⚠️ Popup failed:', popupError.code, popupError.message);
+      
+      // If popup blocked, try redirect
+      if (popupError.code === 'auth/popup-blocked') {
+        console.log('📤 Popup blocked, trying redirect flow...');
+        await signInWithRedirect(auth, provider);
+        return {
+          success: true,
+          redirecting: true,
+          message: 'Redirecting to Google Sign-In...'
+        };
+      }
+      
+      throw popupError;
+    }
+
+    // Success - create user document if needed
+    const user = result.user;
+    console.log('✅ Auth successful:', user.email);
+
+    // Check if user document exists in Firestore
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+      if (!userDoc.exists()) {
+        console.log('📝 Creating new user document...');
+        
+        // Generate unique username
+        const username = await createUniqueUsername(user.email, db);
+
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          id: user.uid,
+          email: user.email,
+          username: username,
+          displayName: user.displayName || 'User',
+          photoURL: user.photoURL || null,
+          bio: '',
+          bike: '',
+          city: '',
+          privacySettings: {
+            profilePublic: true,
+            hideJoinedRides: false
+          },
+          stats: {
+            ridesHosted: 0,
+            ridesJoined: 0
+          },
+          createdAt: serverTimestamp(),
+          lastActive: serverTimestamp(),
+          following: []
+        });
+        console.log('✅ User document created');
+      } else {
+        console.log('👤 User already exists');
+        // Update last active
+        await updateDoc(doc(db, 'users', user.uid), {
+          lastActive: serverTimestamp()
+        });
+      }
+    } catch (firestoreError) {
+      console.error('⚠️ Firestore error:', firestoreError);
+      // Continue even if Firestore fails
+    }
+
+    return {
+      success: true,
+      user: {
+        id: user.uid,
+        email: user.email,
+        name: user.displayName || 'User',
+        photoURL: user.photoURL
+      }
+    };
+
+  } catch (error) {
+    console.error('❌ Google login error:', error.code, error.message);
+    
+    // User-friendly error messages
+    const errorMessage = mapFirebaseError(error.code);
+    
+    return {
+      success: false,
+      error: errorMessage,
+      code: error.code
+    };
+  }
+}
+
+/**
+ * Map Firebase error codes to user-friendly messages
+ */
+function mapFirebaseError(code) {
+  const messages = {
+    'auth/popup-blocked': 'Popup was blocked. Please allow popups and try again, or use Email Sign-In.',
+    'auth/cancelled-popup-request': 'Sign-In cancelled. Please try again.',
+    'auth/popup-closed-by-user': 'Sign-In window closed. Please try again.',
+    'auth/operation-not-supported-in-this-environment': 'Google Sign-In not supported in this browser.',
+    'auth/invalid-api-key': 'Firebase configuration error. Please contact support.',
+    'auth/auth-domain-config-required': 'Firebase is not configured for this domain.',
+    'auth/network-request-failed': 'Network error. Check your internet connection.',
+    'auth/cors-not-allowed': 'Cross-origin error. This is a browser security issue.',
+    'auth/invalid-client-id': 'Firebase configuration error (invalid client ID).',
+    'auth/too-many-requests': 'Too many attempts. Please wait and try again.'
+  };
+  
+  return messages[code] || 'Sign-In failed: ' + code + '. Please try Email Sign-In instead.';
+}
+
+/**
+ * OLD CODE - Initialize Google Sign-In with better error handling
+ * Desktop-only, simple popup flow
+ * 
+ * @returns {Promise<{success: boolean, user?: Object, error?: string, code?: string}>}
+ */
+/* DISABLED
+export async function googleLogin() {
+  try {
+>>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     // Log environment at start
     logEnvironmentDetection('GOOGLE_LOGIN_START', {
       isWebView: isEmbeddedWebView(),
