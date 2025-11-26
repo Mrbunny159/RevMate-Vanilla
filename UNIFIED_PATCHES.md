@@ -42,13 +42,7 @@
    </script>
 @@ -379,11 +384,10 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
--  <!-- Google Maps API -->
--  <script async
--    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly">
--  </script>
-+  <!-- Google Maps API - async and defer for optimal loading -->
-+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly"></script>
- 
+-
    <script type="module" src="js/script.js"></script>
  </body>
  </html>

@@ -25,11 +25,7 @@ This document guides you through testing the following fixes:
 
 **File:** `public/index.html`
 
-**What to look for:**
-```html
-<!-- This line should exist with both async AND defer attributes -->
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly"></script>
-```
+
 
 **Verification:**
 - [ ] Open `public/index.html` in text editor

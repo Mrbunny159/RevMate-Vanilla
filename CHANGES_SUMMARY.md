@@ -51,13 +51,9 @@ export { app, auth, db, storage, analytics };
 #### `public/index.html`
 
 **Change 1: Google Maps Script**
-```diff
-- <script async
--   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly">
-- </script>
 
-+ <!-- Google Maps API - async and defer for optimal loading -->
-+ <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs3krT6aNYDFo3KkXKFbxHazHRd4961e0&libraries=places,geometry&v=weekly"></script>
+
+
 ```
 **Impact:** Maps loads non-blocking, eliminating "loading=async" warning
 
