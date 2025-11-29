@@ -2,7 +2,7 @@
   "name": "RevMate",
   "short_name": "RevMate",
   "start_url": "/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#CDB4DB",
   "theme_color": "#CDB4DB",
   "icons": [

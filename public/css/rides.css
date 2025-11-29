@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    RIDES MODULE - Accent Colors & High Contrast
    Real-time Ride Cards, Buttons, and State Indicators
    ============================================ */
@@ -8,39 +8,27 @@
   --rides-accent-primary: var(--accent, #7B68EE);
   --rides-accent-light: var(--primary, #A29BFE);
   --rides-accent-dark: #5F3DC4;
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   /* Status colors */
   --rides-joined-green: #27AE60;
   --rides-hosted-blue: #3498DB;
   --rides-pending-yellow: #F39C12;
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   /* Button colors (dynamically use theme accent) */
   --rides-btn-join-primary: var(--accent, #7B68EE);
   --rides-btn-join-hover: #5F3DC4;
   --rides-btn-joined-success: #27AE60;
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   /* Card and background */
   --rides-card-bg: #FFFFFF;
   --rides-card-border: #E8E4F3;
   --rides-card-shadow: 0 4px 12px rgba(123, 104, 238, 0.08);
   --rides-card-hover-shadow: 0 8px 24px rgba(123, 104, 238, 0.15);
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   /* Text colors */
   --rides-text-dark: #1A1A2E;
   --rides-text-light: #666666;
@@ -109,8 +97,6 @@
   margin-left: 8px;
 }
 
-<<<<<<< HEAD
-=======
 /* Description section */
 .ride-description {
   padding: 12px 0;
@@ -132,7 +118,6 @@
   text-overflow: ellipsis;
 }
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 /* Card body with info rows */
 .ride-card-body {
   margin-bottom: 16px;
@@ -443,10 +428,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
-<<<<<<< HEAD
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   to {
     opacity: 1;
     transform: translateY(0);
@@ -504,7 +486,6 @@
   .ride-title {
     font-size: 1rem;
   }
-<<<<<<< HEAD
   
   .ride-card {
     padding: 14px;
@@ -514,7 +495,6 @@
     padding: 14px;
   }
   
-=======
 
   .ride-card {
     padding: 14px;
@@ -524,13 +504,11 @@
     padding: 14px;
   }
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   .btn-join,
   .btn-joined {
     padding: 8px 12px;
     font-size: 0.85rem;
   }
-<<<<<<< HEAD
   
   .empty-state-container {
     padding: 40px 16px;
@@ -540,7 +518,6 @@
     font-size: 3rem;
   }
   
-=======
 
   .empty-state-container {
     padding: 40px 16px;
@@ -550,7 +527,6 @@
     font-size: 3rem;
   }
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   .ride-notification {
     bottom: 16px;
     right: 16px;
@@ -563,16 +539,12 @@
     flex-direction: column;
     gap: 8px;
   }
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   .badge-public {
     align-self: flex-start;
     margin-left: 0;
   }
-<<<<<<< HEAD
   
   .ride-info-row {
     gap: 10px;
@@ -582,7 +554,6 @@
     flex-direction: column;
   }
   
-=======
 
   .ride-info-row {
     gap: 10px;
@@ -592,25 +563,18 @@
     flex-direction: column;
   }
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   .btn-join,
   .btn-joined {
     width: 100%;
   }
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   .rides-tabs {
     flex-direction: column;
     gap: 8px;
   }
-<<<<<<< HEAD
   
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   .tab-btn {
     padding: 10px 16px;
     width: 100%;
@@ -625,10 +589,7 @@
   from {
     opacity: 0;
   }
-<<<<<<< HEAD
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   to {
     opacity: 1;
   }
@@ -639,10 +600,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
-<<<<<<< HEAD
-=======
 
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
   to {
     opacity: 1;
     transform: translateY(0);
@@ -652,8 +610,5 @@
 .ride-card,
 .my-ride-card {
   animation: slideInUp 0.4s ease;
-<<<<<<< HEAD
 }
-=======
 }
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)

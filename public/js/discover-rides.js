@@ -1,5 +1,5 @@
 // ============================================
-// DISCOVER RIDES MODULE (WebView-friendly)
+// DISCOVER RIDES MODULE
 // ============================================
 
 import { db } from './firebase-config.js';
@@ -110,15 +110,11 @@ function renderRides(rides) {
     const actionLabel = isJoined ? 'Cancel' : 'Join Ride';
     const actionType = isJoined ? 'leave' : 'join';
 
-<<<<<<< HEAD
-=======
     // Safely get location data with null checks
     const startLat = ride.startLocation?.latitude ?? 0;
     const startLng = ride.startLocation?.longitude ?? 0;
     const orgId = ride.organizerId || 'Unknown';
     const partCount = ride.participantsCount ?? 0;
-
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
     return `
     <div class="col-md-6 col-lg-4">
       <div class="ride-card">
@@ -140,11 +136,7 @@ function renderRides(rides) {
             <i class="bi bi-geo-alt ride-icon"></i>
             <div>
               <p class="ride-label">Start Location</p>
-<<<<<<< HEAD
-              <p class="ride-value">${ride.startLocation.latitude.toFixed(2)}°, ${ride.startLocation.longitude.toFixed(2)}°</p>
-=======
               <p class="ride-value">${startLat.toFixed(2)}°, ${startLng.toFixed(2)}°</p>
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
             </div>
           </div>
           
@@ -152,11 +144,7 @@ function renderRides(rides) {
             <i class="bi bi-person ride-icon"></i>
             <div>
               <p class="ride-label">Organizer ID</p>
-<<<<<<< HEAD
-              <p class="ride-value">${escapeHtml(ride.organizerId.substring(0, 8))}...</p>
-=======
               <p class="ride-value">${escapeHtml(orgId.substring(0, 8))}...</p>
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
             </div>
           </div>
           
@@ -164,11 +152,7 @@ function renderRides(rides) {
             <i class="bi bi-people ride-icon"></i>
             <div>
               <p class="ride-label">Participants</p>
-<<<<<<< HEAD
-              <p class="ride-value">${ride.participantsCount} rider${ride.participantsCount !== 1 ? 's' : ''}</p>
-=======
               <p class="ride-value">${partCount} rider${partCount !== 1 ? 's' : ''}</p>
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
             </div>
           </div>
         </div>
@@ -239,7 +223,7 @@ function getCurrentUid() {
 // imported earlier: `import { joinRide, leaveRide } from './firebase-db.js';
 
 /**
- * Show notification using custom UI (WebView-friendly)
+ * Show notification using custom UI
  * @param {string} message - Notification message
  * @param {string} type - Notification type (success, error, info)
  */

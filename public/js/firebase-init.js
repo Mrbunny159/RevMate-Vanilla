@@ -6,6 +6,8 @@
 // All other modules import from here to get initialized instances
 // ============================================
 
+console.log('🔍 DEBUG: firebase-init.js is loading...');
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";

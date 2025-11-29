@@ -11,32 +11,11 @@ import {
     GoogleAuthProvider,
     OAuthProvider,
     signInWithPopup,
-    signInWithRedirect,
     RecaptchaVerifier,
     signInWithPhoneNumber
 } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
 
-// Safe import with fallbacks to prevent module breakage
-let isWebView, handleAuthRedirect, logWebViewDebug;
-try {
-    const webviewModule = await import('./webview-helper.js');
-    isWebView = webviewModule.isWebView;
-    handleAuthRedirect = webviewModule.handleAuthRedirect;
-    logWebViewDebug = webviewModule.logWebViewDebug;
-    console.log('✅ WebView helper loaded successfully');
-} catch (error) {
-    console.warn('⚠️ WebView helper unavailable, using desktop-only mode:', error.message);
-    isWebView = () => false;
-    handleAuthRedirect = async () => null;
-    logWebViewDebug = () => { };
-}
-
-<<<<<<< HEAD
 import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
-=======
-import { doc, setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
-import { createUniqueUsername } from './utils/username-generator.js';
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
 
 /**
  * Register a new user with email and password
@@ -50,61 +29,25 @@ export async function registerUser(email, password, name) {
         // Create user in Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
-<<<<<<< HEAD
+        
         // Create user document in Firestore
         await setDoc(doc(db, 'users', user.uid), {
             id: user.uid,
             name: name,
             email: email,
             createdAt: new Date(),
-=======
-        // Generate unique username from email
-        const username = await createUniqueUsername(email, db);
-        console.log(`✅ Generated username: ${username} for ${email}`);
-
-        // Create expanded user document in Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-            uid: user.uid,
-            id: user.uid, // Legacy compatibility
-            email: email,
-            username: username,  // NEW: Permanent unique username
-            displayName: name,
-            photoURL: null,
-            bio: '',
-            bike: '',
-            city: '',
-            privacySettings: {
-                profilePublic: true,
-                hideJoinedRides: false
-            },
-            stats: {
-                ridesHosted: 0,
-                ridesJoined: 0
-            },
-            createdAt: serverTimestamp(),
-            lastActive: serverTimestamp(),
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
             following: []
         });
-
+        
         return {
             success: true,
             user: {
                 id: user.uid,
-<<<<<<< HEAD
-=======
-                username: username,
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 name: name,
                 email: email
             }
         };
     } catch (error) {
-<<<<<<< HEAD
-=======
-        console.error('Registration error:', error);
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
         return {
             success: false,
             error: error.message
@@ -122,11 +65,11 @@ export async function loginUser(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
+        
         // Get user data from Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         const userData = userDoc.data();
-
+        
         return {
             success: true,
             user: {
@@ -179,123 +122,45 @@ export function getCurrentUserId() {
 
 /**
  * Process OAuth redirect result (called on app load)
- * Handles the redirect back from Google Sign-In in WebView
- * @returns {Promise} User data if redirected back, null if fresh session
+ * No longer needed since we use popup flow only, but kept for compatibility
+ * @returns {Promise} Always returns null since redirect flow is not used
  */
 export async function processAuthRedirect() {
-    if (isWebView()) {
-        logWebViewDebug('PROCESS_REDIRECT_INIT', {});
-        const redirectResult = await handleAuthRedirect(auth);
-
-        if (redirectResult && redirectResult.success) {
-            logWebViewDebug('REDIRECT_SUCCESS', { uid: redirectResult.user.id });
-            return redirectResult.user;
-        }
-    }
+    // Popup flow only - no redirect processing needed
     return null;
 }
 
 /**
- * Login with Google - Hybrid flow for WebView & Desktop
- * Uses signInWithPopup on desktop, signInWithRedirect in WebView
- * Includes fallback for popup-blocked errors
+ * Login with Google - Popup flow only
+ * Uses signInWithPopup for all environments
  * @returns {Promise} User data or error
  */
 export async function loginWithGoogle() {
     try {
+        console.log('🔐 Starting Google login with popup flow');
+        
         const provider = new GoogleAuthProvider();
-        const webview = isWebView();
-
-        // Check if running in PWA standalone mode
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-            window.navigator.standalone === true ||
-            document.referrer.includes('android-app://');
-
-        // Configure provider for maximum compatibility
+        
+        // Configure provider
         provider.addScope('email');
         provider.addScope('profile');
         provider.setCustomParameters({
             'prompt': 'select_account', // Let user choose account
             'access_type': 'offline'
         });
-
-        logWebViewDebug('GOOGLE_LOGIN_START', { isWebView: webview, isPWA });
-
-        let result;
-
-        // Use redirect for PWA standalone mode or WebView
-        if (isPWA || webview) {
-            // PWA or WebView: Use redirect flow
-            if (isPWA) {
-                console.log('📱 PWA standalone mode detected - using redirect flow');
-            } else {
-                console.log('📱 WebView detected - using redirect flow');
-            }
-            logWebViewDebug('REDIRECT_FLOW_INITIATED', {
-                method: 'signInWithRedirect',
-                scopes: ['email', 'profile']
-            });
-
-            try {
-                await signInWithRedirect(auth, provider);
-                // After redirect back, handleAuthRedirect() is called on app load
-                return {
-                    success: true,
-                    message: 'Redirecting to Google Sign-In...'
-                };
-            } catch (redirectError) {
-                console.error('❌ Redirect flow error:', redirectError.code, redirectError.message);
-                logWebViewDebug('REDIRECT_FLOW_ERROR', {
-                    code: redirectError.code,
-                    message: redirectError.message
-                });
-
-                // If redirect fails, throw to show user error
-                throw redirectError;
-            }
-        } else {
-            // Desktop: Use popup flow (inline auth dialog)
-            console.log('🖥️ Desktop browser detected - using popup flow');
-            logWebViewDebug('POPUP_FLOW_INITIATED', { method: 'signInWithPopup' });
-
-            try {
-                result = await signInWithPopup(auth, provider);
-            } catch (popupError) {
-                console.error('❌ Popup error:', popupError.code, popupError.message);
-                logWebViewDebug('POPUP_ERROR', {
-                    code: popupError.code,
-                    message: popupError.message
-                });
-
-                // If popup blocked, try redirect as fallback
-                if (popupError.code === 'auth/popup-blocked') {
-                    console.log('⚠️ Popup blocked - trying redirect as fallback');
-                    logWebViewDebug('POPUP_BLOCKED_FALLBACK', {
-                        method: 'signInWithRedirect'
-                    });
-
-                    await signInWithRedirect(auth, provider);
-                    return {
-                        success: true,
-                        message: 'Redirecting to Google Sign-In...'
-                    };
-                }
-
-                // Other popup errors
-                throw popupError;
-            }
-        }
-
+        
+        // Use popup flow only
+        const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        logWebViewDebug('AUTH_SUCCESS', { uid: user.uid, email: user.email });
-
+        
+        console.log('✅ Google popup login successful:', user.uid, user.email);
+        
         // Check if user document exists in Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-
+        
         if (!userDoc.exists()) {
             // Create user document if it's a new user
-            logWebViewDebug('CREATE_FIRESTORE_DOC', { uid: user.uid });
-<<<<<<< HEAD
+            console.log('📝 Creating Firestore document for new user');
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: user.displayName || 'User',
@@ -303,46 +168,20 @@ export async function loginWithGoogle() {
                 photoURL: user.photoURL || null,
                 authProvider: 'google',
                 createdAt: new Date(),
-=======
-
-            // Generate unique username
-            const username = await createUniqueUsername(user.email, db);
-
-            await setDoc(doc(db, 'users', user.uid), {
-                uid: user.uid,
-                id: user.uid,
-                email: user.email,
-                username: username,
-                displayName: user.displayName || 'User',
-                photoURL: user.photoURL || null,
-                bio: '',
-                bike: '',
-                city: '',
-                privacySettings: {
-                    profilePublic: true,
-                    hideJoinedRides: false
-                },
-                stats: {
-                    ridesHosted: 0,
-                    ridesJoined: 0
-                },
-                authProvider: 'google',
-                createdAt: serverTimestamp(),
-                lastActive: serverTimestamp(),
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 following: []
             });
         }
-
+        
+        // Get user data from Firestore
         const userData = (await getDoc(doc(db, 'users', user.uid))).data() || {
             id: user.uid,
             name: user.displayName || 'User',
             email: user.email,
             following: []
         };
-
-        logWebViewDebug('LOGIN_COMPLETE', { success: true });
-
+        
+        console.log('✅ Google login complete');
+        
         return {
             success: true,
             user: {
@@ -354,19 +193,17 @@ export async function loginWithGoogle() {
             }
         };
     } catch (error) {
-        logWebViewDebug('LOGIN_ERROR', {
-            code: error.code,
-            message: error.message
-        });
-
         console.error('❌ Google login error:', error.code, error.message);
-
+        
         // User-friendly error messages
         let userMessage = error.message;
-
-        switch (error.code) {
+        
+        switch(error.code) {
             case 'auth/popup-blocked':
-                userMessage = 'Popup was blocked. Your browser blocked the sign-in window. Please allow popups and try again, or check your popup blocker settings.';
+                userMessage = 'Popup was blocked. Your browser blocked the sign-in window. Please allow popups for this site and try again.';
+                break;
+            case 'auth/popup-closed-by-user':
+                userMessage = 'Sign-in popup was closed. Please try again.';
                 break;
             case 'auth/cancelled-popup-request':
                 userMessage = 'Sign-in was cancelled. Please try again.';
@@ -383,8 +220,10 @@ export async function loginWithGoogle() {
             case 'auth/network-request-failed':
                 userMessage = 'Network error. Please check your internet connection.';
                 break;
+            default:
+                userMessage = error.message || 'An error occurred during sign-in. Please try again.';
         }
-
+        
         return {
             success: false,
             error: userMessage,
@@ -394,62 +233,28 @@ export async function loginWithGoogle() {
 }
 
 /**
- * Login with Apple
+ * Login with Apple - Popup flow only
+ * Uses signInWithPopup for all environments
  * @returns {Promise} User data or error
  */
 export async function loginWithApple() {
     try {
+        console.log('🔐 Starting Apple login with popup flow');
+        
         const provider = new OAuthProvider('apple.com');
         provider.addScope('email');
         provider.addScope('name');
-
-        // Check if running in PWA standalone mode
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-            window.navigator.standalone === true ||
-            document.referrer.includes('android-app://');
-        const webview = isWebView();
-
-        logWebViewDebug('APPLE_LOGIN_START', { isPWA, isWebView: webview });
-
-        let result;
-
-        // Use redirect for PWA standalone mode or WebView
-        if (isPWA || webview) {
-            if (isPWA) {
-                console.log('📱 PWA standalone mode detected - using redirect flow for Apple');
-            } else {
-                console.log('📱 WebView detected - using redirect flow for Apple');
-            }
-            await signInWithRedirect(auth, provider);
-            return {
-                success: true,
-                message: 'Redirecting to Apple Sign-In...'
-            };
-        }
-
-        try {
-            result = await signInWithPopup(auth, provider);
-        } catch (popupError) {
-            if (popupError.code === 'auth/popup-blocked') {
-                console.log('⚠️ Apple popup blocked - trying redirect fallback');
-                logWebViewDebug('APPLE_POPUP_BLOCKED_FALLBACK', {});
-                await signInWithRedirect(auth, provider);
-                return {
-                    success: true,
-                    message: 'Redirecting to Apple Sign-In...'
-                };
-            }
-            throw popupError;
-        }
-
+        
+        // Use popup flow only
+        const result = await signInWithPopup(auth, provider);
+        
         const user = result.user;
-
+        
         // Check if user document exists in Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-
+        
         if (!userDoc.exists()) {
             // Create user document if it's a new user
-<<<<<<< HEAD
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: user.displayName || 'Apple User',
@@ -457,44 +262,17 @@ export async function loginWithApple() {
                 photoURL: user.photoURL || null,
                 authProvider: 'apple',
                 createdAt: new Date(),
-=======
-
-            // Generate unique username
-            const username = await createUniqueUsername(user.email, db);
-
-            await setDoc(doc(db, 'users', user.uid), {
-                uid: user.uid,
-                id: user.uid,
-                email: user.email,
-                username: username,
-                displayName: user.displayName || 'Apple User',
-                photoURL: user.photoURL || null,
-                bio: '',
-                bike: '',
-                city: '',
-                privacySettings: {
-                    profilePublic: true,
-                    hideJoinedRides: false
-                },
-                stats: {
-                    ridesHosted: 0,
-                    ridesJoined: 0
-                },
-                authProvider: 'apple',
-                createdAt: serverTimestamp(),
-                lastActive: serverTimestamp(),
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 following: []
             });
         }
-
+        
         const userData = (await getDoc(doc(db, 'users', user.uid))).data() || {
             id: user.uid,
             name: user.displayName || 'Apple User',
             email: user.email,
             following: []
         };
-
+        
         return {
             success: true,
             user: {
@@ -567,13 +345,12 @@ export async function verifyPhoneCode(confirmationResult, code, name = 'Phone Us
     try {
         const result = await confirmationResult.confirm(code);
         const user = result.user;
-
+        
         // Check if user document exists in Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-
+        
         if (!userDoc.exists()) {
             // Create user document if it's a new user
-<<<<<<< HEAD
             await setDoc(doc(db, 'users', user.uid), {
                 id: user.uid,
                 name: name,
@@ -582,39 +359,10 @@ export async function verifyPhoneCode(confirmationResult, code, name = 'Phone Us
                 photoURL: user.photoURL || null,
                 authProvider: 'phone',
                 createdAt: new Date(),
-=======
-
-            // Generate username from phone or use fallback
-            const emailForUsername = user.email || `user${user.phoneNumber.replace(/[^0-9]/g, '')}@phone.local`;
-            const username = await createUniqueUsername(emailForUsername, db);
-
-            await setDoc(doc(db, 'users', user.uid), {
-                uid: user.uid,
-                id: user.uid,
-                email: user.email || '',
-                username: username,
-                displayName: name,
-                phoneNumber: user.phoneNumber,
-                photoURL: user.photoURL || null,
-                bio: '',
-                bike: '',
-                city: '',
-                privacySettings: {
-                    profilePublic: true,
-                    hideJoinedRides: false
-                },
-                stats: {
-                    ridesHosted: 0,
-                    ridesJoined: 0
-                },
-                authProvider: 'phone',
-                createdAt: serverTimestamp(),
-                lastActive: serverTimestamp(),
->>>>>>> ce03959 (this is the most updated one 26 nov 2025)
                 following: []
             });
         }
-
+        
         const userData = (await getDoc(doc(db, 'users', user.uid))).data() || {
             id: user.uid,
             name: name,
@@ -622,7 +370,7 @@ export async function verifyPhoneCode(confirmationResult, code, name = 'Phone Us
             phoneNumber: user.phoneNumber,
             following: []
         };
-
+        
         return {
             success: true,
             user: {
