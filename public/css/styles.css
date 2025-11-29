@@ -1351,29 +1351,156 @@ body {
    RESPONSIVE DESIGN
    ============================================ */
 
-/* Maps preview and route info */
-#mapPreviewContainer {
-    margin-top: 12px;
+/* Maps preview & picker enhancements */
+.location-input-wrapper {
+    position: relative;
+}
+
+.location-input-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.location-input-actions .btn {
+    font-size: 0.85rem;
+}
+
+.map-preview {
+    background: #fff;
+    border: 1px solid #edf2f7;
+    border-radius: 18px;
+    padding: 18px;
+    margin-top: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+
+.map-preview.hidden {
+    display: none;
+}
+
+.map-preview-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.map-preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 #mapPreview {
     width: 100%;
-    height: 260px;
-    border-radius: 12px;
-    overflow: hidden;
+    height: 280px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
 }
 
-#routeInfo {
+.map-stats {
     display: flex;
-    gap: 12px;
-    justify-content: flex-start;
-    align-items: center;
-    color: #444;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    font-weight: 500;
+    color: #334155;
 }
 
-#distanceText, #durationText {
+.map-note {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.map-preview.fullscreen {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92vw;
+    height: 85vh;
+    z-index: 1100;
+    padding: 22px;
+    border-radius: 24px;
+}
+
+.map-preview.fullscreen #mapPreview {
+    height: calc(85vh - 160px);
+}
+
+.map-preview.fullscreen .map-stats {
+    font-size: 1rem;
+}
+
+.map-close-btn {
+    color: #ff4d6d;
+    font-weight: 600;
+}
+
+.map-preview.fullscreen .map-close-btn {
+    display: inline-flex !important;
+}
+
+.map-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 12, 12, 0.55);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.map-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#distanceText,
+#durationText {
     font-weight: 600;
     font-size: 0.95rem;
+}
+
+.ride-route-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.ride-route-line i {
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.ride-route-point {
+    background: #f1f5f9;
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.ride-meta {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.35rem;
+    margin-bottom: 0;
+}
+
+.ride-address {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin-bottom: 0;
 }
 
 /* Radius selector for Discover */

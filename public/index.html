@@ -19,8 +19,10 @@
   <link rel="icon" type="image/png" href="/icons/app.png">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+  <link rel="icon" type="image/png" href="/icons/app.png">
+
+  <!-- Leaflet (OpenStreetMap) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -269,21 +271,68 @@
             </div>
 
             <div class="mb-3">
-              <label for="latitude" class="form-label">Start Latitude</label>
-              <input type="number" step="any" id="latitude" class="form-control" placeholder="e.g., 19.0176" required>
+              <label for="startLocationInput" class="form-label">Start Location</label>
+              <div class="location-input-wrapper">
+                <input type="text" id="startLocationInput" class="form-control" placeholder="Search for start point (e.g., Gateway of India)" autocomplete="off" required>
+                <div class="location-input-actions">
+                  <button type="button" id="useCurrentLocation" class="btn btn-light btn-sm">
+                    <i class="bi bi-geo-alt-fill me-1"></i>Use My Location
+                  </button>
+                  <button type="button" id="startMapBtn" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-map me-1"></i>Select on Map
+                  </button>
+                </div>
+              </div>
+              <small class="text-muted">Type at least 3 letters, or place a pin on the map. Powered by OpenStreetMap data.</small>
             </div>
 
             <div class="mb-3">
-              <label for="longitude" class="form-label">Start Longitude</label>
-              <input type="number" step="any" id="longitude" class="form-control" placeholder="e.g., 72.8479" required>
+              <label for="endLocationInput" class="form-label">Destination</label>
+              <div class="location-input-wrapper">
+                <input type="text" id="endLocationInput" class="form-control" placeholder="Search for destination (e.g., Lonavala Food Court)" autocomplete="off" required>
+                <div class="location-input-actions">
+                  <button type="button" id="endMapBtn" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-geo-fill me-1"></i>Select on Map
+                  </button>
+                </div>
+              </div>
+              <small class="text-muted">You can search any place that exists on Google Maps—businesses, homes, schools, and more.</small>
             </div>
 
-            <div class="d-grid">
+            <div class="map-preview hidden" id="mapPreviewContainer">
+              <div class="map-preview-header">
+                <div>
+                  <h6>Route Preview</h6>
+                  <p class="text-muted mb-0">Click anywhere on the map, drag markers, or use search to refine locations.</p>
+                </div>
+                <div class="map-preview-controls">
+                  <div class="btn-group btn-group-sm" role="group" aria-label="Map mode toggle">
+                    <button type="button" class="btn btn-outline-secondary active" id="mapModeStart" data-mode="start">Set Start</button>
+                    <button type="button" class="btn btn-outline-secondary" id="mapModeEnd" data-mode="end">Set Destination</button>
+                  </div>
+                  <button type="button" id="expandMapBtn" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrows-fullscreen me-1"></i>Open Full Map
+                  </button>
+                  <button type="button" id="closeMapBtn" class="btn btn-link btn-sm map-close-btn d-none">
+                    <i class="bi bi-x-circle me-1"></i>Close
+                  </button>
+                </div>
+              </div>
+              <div id="mapPreview"></div>
+              <div class="map-stats">
+                <span id="distanceText">Distance: —</span>
+                <span id="durationText">Estimated Duration: —</span>
+              </div>
+              <p class="map-note text-muted mb-0">Maps powered by OpenStreetMap + OSRM. Coverage includes most buildings, businesses, homes, and schools.</p>
+            </div>
+
+            <div class="d-grid mt-4">
               <button id="hostRideBtn" type="button" class="btn btn-host w-100">
                 <i class="bi bi-plus-circle me-2"></i>Host Ride
               </button>
             </div>
           </form>
+          <div id="mapBackdrop" class="map-backdrop hidden"></div>
         </div>
       </div>
     </section>
@@ -427,6 +476,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script type="module" src="js/script.js"></script>
 </body>
 </html>

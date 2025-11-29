@@ -71,6 +71,8 @@ function formatDateTime(firestoreTimestamp) {
  */
 function transformRideDoc(doc) {
   const data = doc.data() || {};
+  const distanceRaw = typeof data.distanceKm === 'number' ? data.distanceKm : Number(data.distanceKm);
+  const durationRaw = typeof data.durationMinutes === 'number' ? data.durationMinutes : Number(data.durationMinutes);
 
   return {
     id: doc.id,
@@ -80,6 +82,12 @@ function transformRideDoc(doc) {
     formattedDateTime: formatDateTime(data.rideDateTime),
     startLocation: data.startLocation || {},
     endLocation: data.endLocation || {},
+    startLocationName: data.startLocationName || '',
+    startLocationAddress: data.startLocationAddress || '',
+    endLocationName: data.endLocationName || '',
+    endLocationAddress: data.endLocationAddress || '',
+    distanceKm: Number.isFinite(distanceRaw) ? distanceRaw : null,
+    durationMinutes: Number.isFinite(durationRaw) ? durationRaw : null,
     organizerId: data.organizerId || '',
     participants: Array.isArray(data.participants) ? data.participants : [],
     participantsCount: Array.isArray(data.participants) ? data.participants.length : 0,
@@ -204,6 +212,20 @@ export function renderDiscoverRides(rides = []) {
     // Truncate description to 150 characters
     const description = ride.description || '';
     const truncatedDesc = description.length > 150 ? description.substring(0, 150) + '...' : description;
+    const startName = escapeHtml(ride.startLocationName || 'Start point not set');
+    const endName = escapeHtml(ride.endLocationName || 'Destination not set');
+    const distanceText = typeof ride.distanceKm === 'number' ? `${ride.distanceKm.toFixed(1)} km` : '';
+    const durationText = typeof ride.durationMinutes === 'number' ? `${ride.durationMinutes} mins` : '';
+    const routeMeta = distanceText || durationText
+      ? `<p class="ride-meta">${[distanceText, durationText].filter(Boolean).join(' • ')}</p>`
+      : '';
+    const startAddressLine = ride.startLocationAddress
+      ? `<p class="ride-address"><strong>Start:</strong> ${escapeHtml(ride.startLocationAddress)}</p>`
+      : '';
+    const endAddressLine = ride.endLocationAddress
+      ? `<p class="ride-address"><strong>End:</strong> ${escapeHtml(ride.endLocationAddress)}</p>`
+      : '';
+
     return `
       <div class="col-md-6 col-lg-4">
         <div class="ride-card">
@@ -228,11 +250,15 @@ export function renderDiscoverRides(rides = []) {
             <div class="ride-info-row">
               <i class="bi bi-geo-alt ride-icon"></i>
               <div>
-                <p class="ride-label">Location</p>
-                <p class="ride-value">
-                  ${ride.startLocation.latitude?.toFixed(2) || '0.00'}°, 
-                  ${ride.startLocation.longitude?.toFixed(2) || '0.00'}°
-                </p>
+                <p class="ride-label">Route</p>
+                <div class="ride-route-line">
+                  <span class="ride-route-point">${startName}</span>
+                  <i class="bi bi-arrow-right-short"></i>
+                  <span class="ride-route-point">${endName}</span>
+                </div>
+                ${routeMeta}
+                ${startAddressLine}
+                ${endAddressLine}
               </div>
             </div>
             
@@ -384,6 +410,14 @@ export function renderMyHostedRides(rides = []) {
   }
 
   container.innerHTML = rides.map(ride => {
+    const startName = escapeHtml(ride.startLocationName || 'Start point not set');
+    const endName = escapeHtml(ride.endLocationName || 'Destination not set');
+    const distanceText = typeof ride.distanceKm === 'number' ? `${ride.distanceKm.toFixed(1)} km` : '';
+    const durationText = typeof ride.durationMinutes === 'number' ? `${ride.durationMinutes} mins` : '';
+    const routeMeta = distanceText || durationText
+      ? `<span class="ride-meta">${[distanceText, durationText].filter(Boolean).join(' • ')}</span>`
+      : '';
+
     return `
       <div class="my-ride-card">
         <div class="ride-type-badge hosted">
@@ -400,7 +434,14 @@ export function renderMyHostedRides(rides = []) {
           
           <div class="ride-detail-row">
             <i class="bi bi-geo-alt"></i>
-            <span class="detail-value">${ride.startLocation?.latitude?.toFixed(2) || '0.00'}°, ${ride.startLocation?.longitude?.toFixed(2) || '0.00'}°</span>
+            <span class="detail-value">
+              <span class="ride-route-line">
+                <span class="ride-route-point">${startName}</span>
+                <i class="bi bi-arrow-right-short"></i>
+                <span class="ride-route-point">${endName}</span>
+              </span>
+              ${routeMeta}
+            </span>
           </div>
           
           <div class="ride-detail-row">
@@ -505,6 +546,17 @@ export function renderMyJoinedRides(rides = []) {
   }
 
   container.innerHTML = rides.map(ride => {
+    const startName = escapeHtml(ride.startLocationName || 'Start point not set');
+    const endName = escapeHtml(ride.endLocationName || 'Destination not set');
+    const distanceText = typeof ride.distanceKm === 'number' ? `${ride.distanceKm.toFixed(1)} km` : '';
+    const durationText = typeof ride.durationMinutes === 'number' ? `${ride.durationMinutes} mins` : '';
+    const routeMeta = distanceText || durationText
+      ? `<span class="ride-meta">${[distanceText, durationText].filter(Boolean).join(' • ')}</span>`
+      : '';
+    const organizerLabel = ride.organizerId
+      ? `Organized by ${escapeHtml(ride.organizerId.substring(0, 12))}…`
+      : 'Organized by —';
+
     return `
       <div class="my-ride-card">
         <div class="ride-type-badge joined">
@@ -521,12 +573,19 @@ export function renderMyJoinedRides(rides = []) {
           
           <div class="ride-detail-row">
             <i class="bi bi-geo-alt"></i>
-            <span class="detail-value">${ride.startLocation?.latitude?.toFixed(2) || '0.00'}°, ${ride.startLocation?.longitude?.toFixed(2) || '0.00'}°</span>
+            <span class="detail-value">
+              <span class="ride-route-line">
+                <span class="ride-route-point">${startName}</span>
+                <i class="bi bi-arrow-right-short"></i>
+                <span class="ride-route-point">${endName}</span>
+              </span>
+              ${routeMeta}
+            </span>
           </div>
           
           <div class="ride-detail-row">
             <i class="bi bi-person-circle"></i>
-            <span class="detail-value">Organized by ${ride.organizerId.substring(0, 12)}...</span>
+            <span class="detail-value">${organizerLabel}</span>
           </div>
           
           <div class="ride-detail-row">

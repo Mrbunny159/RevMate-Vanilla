@@ -10,7 +10,15 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getCurrentUserId } from './firebase-auth.js';
-import { getStartLocation, getEndLocation, ensureMapsReady, initializeMaps } from './maps-leaflet.js';
+import { getStartLocation, getEndLocation, ensureMapsReady, initializeMaps, resetMapSelections } from './maps-leaflet.js';
+function formatLatLngLabel(locationObj = {}) {
+  const lat = Number(locationObj.lat ?? locationObj.latitude);
+  const lng = Number(locationObj.lng ?? locationObj.longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+  return 'Pinned Location';
+}
 import { saveRide } from './rides.js';
 // Small HTML-escaped helper
 function escapeHtml(text) {
@@ -98,8 +106,16 @@ export async function hostRide() {
       showInlineMessage('Please select a start location from the dropdown suggestions that appear as you type.', { type: 'error', targetId: 'startLocationInput' });
       return;
     }
+    if (!startLocation.name && !startLocation.address) {
+      showInlineMessage('Please pick a recognizable start location so others can follow along.', { type: 'error', targetId: 'startLocationInput' });
+      return;
+    }
     if (!endLocation || !endLocation.lat || !endLocation.lng) {
       showInlineMessage('Please select a destination from the dropdown suggestions that appear as you type.', { type: 'error', targetId: 'endLocationInput' });
+      return;
+    }
+    if (!endLocation.name && !endLocation.address) {
+      showInlineMessage('Please pick a recognizable destination so others know where to ride.', { type: 'error', targetId: 'endLocationInput' });
       return;
     }
 
@@ -148,6 +164,11 @@ export async function hostRide() {
     const durationMinutes = lastRoute?.durationMinutes ?? null;
 
     // NEW DATA STRUCTURE with proper GeoPoint and metadata
+    const normalizedStartName = startLocation.name || startLocation.address || formatLatLngLabel(startLocation);
+    const normalizedStartAddress = startLocation.address || startLocation.name || formatLatLngLabel(startLocation);
+    const normalizedEndName = endLocation.name || endLocation.address || formatLatLngLabel(endLocation);
+    const normalizedEndAddress = endLocation.address || endLocation.name || formatLatLngLabel(endLocation);
+
     const rideToSave = {
       title,
       description,  // NEW: Optional description field
@@ -158,12 +179,12 @@ export async function hostRide() {
       requests: [],
       // GeoPoint for startLocation
       startLocation: new GeoPoint(Number(startLocation.lat), Number(startLocation.lng)),
-      startLocationName: startLocation.name || '',
-      startLocationAddress: startLocation.address || '',
+      startLocationName: normalizedStartName,
+      startLocationAddress: normalizedStartAddress,
       // GeoPoint for endLocation  
       endLocation: new GeoPoint(Number(endLocation.lat), Number(endLocation.lng)),
-      endLocationName: endLocation.name || '',
-      endLocationAddress: endLocation.address || '',
+      endLocationName: normalizedEndName,
+      endLocationAddress: normalizedEndAddress,
       distanceKm: distanceKm ?? null,
       durationMinutes: durationMinutes ?? null,
       createdAt: serverTimestamp()
@@ -181,6 +202,7 @@ export async function hostRide() {
     // Hide map preview
     const preview = document.getElementById('mapPreviewContainer');
     if (preview) preview.classList.add('hidden');
+    resetMapSelections();
 
     showInlineMessage('Ride hosted successfully — visible to all users in Discover.', { type: 'success', targetId: 'hostRideBtn' });
 
