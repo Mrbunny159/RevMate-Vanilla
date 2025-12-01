@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maps Test - Leaflet + OSM</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #mapPreview {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid #ddd;
+        }
+
+        .route-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .route-info p {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .location-suggestions {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            width: calc(100% - 24px);
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+        }
+
+        .suggestion-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: #f5f5f5;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🗺️ Leaflet Maps Test</h1>
+
+        <div id="status" class="status info">
+            Loading maps library...
+        </div>
+
+        <div class="form-group">
+            <label for="startLocationInput">Start Location</label>
+            <div style="position: relative;">
+                <input type="text" id="startLocationInput" placeholder="Search for a location in India..."
+                    autocomplete="off">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="endLocationInput">End Location</label>
+            <div style="position: relative;">
+                <input type="text" id="endLocationInput" placeholder="Search for destination..." autocomplete="off">
+            </div>
+        </div>
+
+        <button id="useCurrentLocation">📍 Use My Current Location</button>
+        <button id="clearMap">🗑️ Clear Map</button>
+
+        <div id="mapPreview"></div>
+
+        <div id="routeInfo" class="route-info" style="display: none;">
+            <p><strong id="distanceText">Distance: —</strong></p>
+            <p><strong id="durationText">Duration: —</strong></p>
+            <p id="startLocationDetails" style="color: #28a745;">Start: —</p>
+            <p id="endLocationDetails" style="color: #dc3545;">End: —</p>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Maps Module -->
+    <script type="module">
+        import { initializeMaps, getStartLocation, getEndLocation, getLastRoute } from './js/maps-leaflet.js';
+
+        const statusEl = document.getElementById('status');
+        const routeInfo = document.getElementById('routeInfo');
+
+        // Initialize maps
+        try {
+            await initializeMaps({
+                startInputId: 'startLocationInput',
+                endInputId: 'endLocationInput',
+                mapContainerId: 'mapPreview'
+            });
+
+            statusEl.className = 'status success';
+            statusEl.textContent = '✅ Maps initialized successfully! Try searching for locations in India.';
+
+            // Monitor for route updates
+            setInterval(() => {
+                const start = getStartLocation();
+                const end = getEndLocation();
+                const route = getLastRoute();
+
+                if (start && end) {
+                    routeInfo.style.display = 'block';
+
+                    document.getElementById('startLocationDetails').textContent =
+                        `Start: ${start.name || 'Unknown'} (${start.lat.toFixed(4)}, ${start.lng.toFixed(4)})`;
+                    document.getElementById('endLocationDetails').textContent =
+                        `End: ${end.name || 'Unknown'} (${end.lat.toFixed(4)}, ${end.lng.toFixed(4)})`;
+
+                    if (route) {
+                        document.getElementById('distanceText').textContent = `Distance: ${route.distanceKm} km`;
+                        document.getElementById('durationText').textContent = `Duration: ~${route.durationMinutes} minutes`;
+                    }
+                } else {
+                    routeInfo.style.display = 'none';
+                }
+            }, 1000);
+
+        } catch (error) {
+            statusEl.className = 'status error';
+            statusEl.textContent = `❌ Error: ${error.message}`;
+            console.error('Maps initialization error:', error);
+        }
+
+        // Clear map button
+        document.getElementById('clearMap').addEventListener('click', () => {
+            document.getElementById('startLocationInput').value = '';
+            document.getElementById('endLocationInput').value = '';
+            routeInfo.style.display = 'none';
+            statusEl.className = 'status info';
+            statusEl.textContent = 'Map cleared. Enter new locations.';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,614 @@
+﻿/* ============================================
+   RIDES MODULE - Accent Colors & High Contrast
+   Real-time Ride Cards, Buttons, and State Indicators
+   ============================================ */
+
+:root {
+  /* Primary accent colors (inherited from main theme) */
+  --rides-accent-primary: var(--accent, #7B68EE);
+  --rides-accent-light: var(--primary, #A29BFE);
+  --rides-accent-dark: #5F3DC4;
+  
+
+  /* Status colors */
+  --rides-joined-green: #27AE60;
+  --rides-hosted-blue: #3498DB;
+  --rides-pending-yellow: #F39C12;
+  
+
+  /* Button colors (dynamically use theme accent) */
+  --rides-btn-join-primary: var(--accent, #7B68EE);
+  --rides-btn-join-hover: #5F3DC4;
+  --rides-btn-joined-success: #27AE60;
+  
+
+  /* Card and background */
+  --rides-card-bg: #FFFFFF;
+  --rides-card-border: #E8E4F3;
+  --rides-card-shadow: 0 4px 12px rgba(123, 104, 238, 0.08);
+  --rides-card-hover-shadow: 0 8px 24px rgba(123, 104, 238, 0.15);
+  
+
+  /* Text colors */
+  --rides-text-dark: #1A1A2E;
+  --rides-text-light: #666666;
+  --rides-text-muted: #999999;
+}
+
+/* Dark mode adjustments */
+.dark-mode {
+  --rides-card-bg: #2a2a2a;
+  --rides-card-border: #4a4a4a;
+  --rides-card-shadow: 0 4px 12px rgba(123, 104, 238, 0.12);
+  --rides-text-dark: #f5f5f5;
+  --rides-text-light: #b0b0b0;
+}
+
+/* ============================================
+   DISCOVER RIDES CARDS
+   ============================================ */
+
+.ride-card {
+  background: var(--rides-card-bg);
+  border: 1.5px solid var(--rides-card-border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: var(--rides-card-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.ride-card:hover {
+  box-shadow: var(--rides-card-hover-shadow);
+  border-color: var(--rides-accent-primary);
+  transform: translateY(-2px);
+}
+
+/* Card header with title and public badge */
+.ride-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rides-card-border);
+}
+
+.ride-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--rides-text-dark);
+  margin: 0;
+  flex: 1;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.badge-public {
+  background: linear-gradient(135deg, var(--rides-accent-primary), var(--rides-accent-light));
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+/* Description section */
+.ride-description {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rides-card-border);
+  margin-bottom: 16px;
+}
+
+.ride-description p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--rides-text-light);
+  line-height: 1.6;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  /* Standard property for compatibility */
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+/* Card body with info rows */
+.ride-card-body {
+  margin-bottom: 16px;
+}
+
+.ride-info-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.ride-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.ride-icon {
+  font-size: 1.2rem;
+  color: var(--rides-accent-primary);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ride-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--rides-text-muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ride-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--rides-text-dark);
+  margin: 4px 0 0 0;
+}
+
+.ride-value-accent {
+  color: var(--rides-accent-primary);
+  font-weight: 600;
+}
+
+/* Card footer with action buttons */
+.ride-card-footer {
+  padding-top: 12px;
+  border-top: 1px solid var(--rides-card-border);
+  display: flex;
+  gap: 10px;
+}
+
+/* Join/Cancel buttons */
+.btn-join,
+.btn-joined {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-join {
+  background: linear-gradient(135deg, var(--rides-btn-join-primary), var(--rides-accent-dark));
+  color: white;
+  box-shadow: 0 4px 8px rgba(123, 104, 238, 0.3);
+}
+
+.btn-join:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--rides-btn-join-hover), var(--rides-accent-dark));
+  box-shadow: 0 6px 16px rgba(123, 104, 238, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-join:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(123, 104, 238, 0.3);
+}
+
+.btn-joined {
+  background: linear-gradient(135deg, var(--rides-joined-green), #1E8449);
+  color: white;
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+  cursor: default;
+  opacity: 0.9;
+}
+
+.btn-join:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-join i,
+.btn-joined i {
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   MY RIDES CARDS (Hosted & Joined)
+   ============================================ */
+
+.my-ride-card {
+  background: var(--rides-card-bg);
+  border: 1.5px solid var(--rides-card-border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--rides-card-shadow);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.my-ride-card:hover {
+  box-shadow: var(--rides-card-hover-shadow);
+  border-color: var(--rides-accent-primary);
+}
+
+/* Ride type badges */
+.ride-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ride-type-badge.hosted {
+  background: linear-gradient(135deg, var(--rides-hosted-blue), #2980B9);
+}
+
+.ride-type-badge.joined {
+  background: linear-gradient(135deg, var(--rides-joined-green), #1E8449);
+}
+
+.ride-type-badge i {
+  font-size: 0.9rem;
+}
+
+/* Card title */
+.ride-card-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--rides-text-dark);
+  margin: 0 0 14px 0;
+  line-height: 1.3;
+}
+
+/* Ride details */
+.ride-details {
+  margin-bottom: 14px;
+}
+
+.ride-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: var(--rides-text-dark);
+}
+
+.ride-detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.ride-detail-row i {
+  color: var(--rides-accent-primary);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: var(--rides-text-dark);
+  font-weight: 500;
+}
+
+.detail-accent {
+  color: var(--rides-accent-primary);
+  font-weight: 600;
+}
+
+/* Card actions */
+.ride-card-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rides-card-border);
+}
+
+.btn-secondary,
+.btn-danger {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-secondary {
+  background: var(--rides-card-border);
+  color: var(--rides-text-dark);
+}
+
+.btn-secondary:hover {
+  background: #D5C8E8;
+  color: var(--rides-accent-dark);
+}
+
+.btn-danger {
+  background: #E74C3C;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #C0392B;
+}
+
+/* ============================================
+   EMPTY STATE MESSAGES
+   ============================================ */
+
+.empty-state-container {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--rides-text-muted);
+}
+
+.empty-state-container i {
+  font-size: 4rem;
+  color: var(--rides-accent-primary);
+  opacity: 0.6;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  color: var(--rides-text-light);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ============================================
+   NOTIFICATIONS/TOASTS
+   ============================================ */
+
+.ride-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  animation: slideUp 0.3s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.ride-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ride-notification-success {
+  background: linear-gradient(135deg, var(--rides-joined-green), #1E8449);
+  color: white;
+}
+
+.ride-notification-error {
+  background: linear-gradient(135deg, #E74C3C, #C0392B);
+  color: white;
+}
+
+.ride-notification-info {
+  background: linear-gradient(135deg, var(--rides-accent-primary), var(--rides-accent-light));
+  color: white;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   TAB BUTTONS (Hosted/Joined)
+   ============================================ */
+
+.rides-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--rides-card-border);
+}
+
+.tab-btn {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--rides-text-light);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tab-btn:hover {
+  color: var(--rides-accent-primary);
+  border-bottom-color: var(--rides-accent-primary);
+}
+
+.tab-btn.active {
+  color: var(--rides-accent-primary);
+  border-bottom-color: var(--rides-accent-primary);
+  font-weight: 700;
+}
+
+.tab-btn i {
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .ride-title {
+    font-size: 1rem;
+  }
+  
+  .ride-card {
+    padding: 14px;
+  }
+  
+  .my-ride-card {
+    padding: 14px;
+  }
+  
+
+  .ride-card {
+    padding: 14px;
+  }
+
+  .my-ride-card {
+    padding: 14px;
+  }
+
+  .btn-join,
+  .btn-joined {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .empty-state-container {
+    padding: 40px 16px;
+  }
+  
+  .empty-state-container i {
+    font-size: 3rem;
+  }
+  
+
+  .empty-state-container {
+    padding: 40px 16px;
+  }
+
+  .empty-state-container i {
+    font-size: 3rem;
+  }
+
+  .ride-notification {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ride-card-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+
+  .badge-public {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+  
+  .ride-info-row {
+    gap: 10px;
+  }
+  
+  .ride-card-footer {
+    flex-direction: column;
+  }
+  
+
+  .ride-info-row {
+    gap: 10px;
+  }
+
+  .ride-card-footer {
+    flex-direction: column;
+  }
+
+  .btn-join,
+  .btn-joined {
+    width: 100%;
+  }
+  
+
+  .rides-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+
+  .tab-btn {
+    padding: 10px 16px;
+    width: 100%;
+  }
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ride-card,
+.my-ride-card {
+  animation: slideInUp 0.4s ease;
+}
+}

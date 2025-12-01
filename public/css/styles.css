@@ -1,0 +1,1604 @@
+/* ============================================
+   REVMATE - STYLES (PHASE 1-5)
+   ============================================ */
+
+/* ============================================
+   THEME COLOR SYSTEM
+   ============================================ */
+
+/* Default Theme - Mint Dream (Pastel) */
+:root {
+    --primary: #A8DADC;
+    --secondary: #FEC8D8;
+    --accent: #CDB4DB;
+    --background: #F7F7F7;
+    --text-dark: #333;
+    --success: #B8E0D2;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ============================================
+   PASTEL COLOR THEMES
+   ============================================ */
+
+/* Mint Dream Theme */
+:root.theme-mint {
+    --primary: #A8DADC;
+    --secondary: #F8E8E8;
+    --accent: #CDB4DB;
+}
+
+/* Blush Rose Theme */
+:root.theme-blush {
+    --primary: #FEC8D8;
+    --secondary: #E8D5E8;
+    --accent: #FF6B9D;
+}
+
+/* Lavender Theme */
+:root.theme-lavender {
+    --primary: #CDB4DB;
+    --secondary: #E8D5F8;
+    --accent: #9B7EBD;
+}
+
+/* Seafoam Theme */
+:root.theme-seafoam {
+    --primary: #B8E0D2;
+    --secondary: #D8F0E8;
+    --accent: #76C9A1;
+}
+
+/* Peach Theme */
+:root.theme-peach {
+    --primary: #FFCDB2;
+    --secondary: #FFE5D9;
+    --accent: #FF9D71;
+}
+
+/* ============================================
+   VIBRANT COLOR THEMES
+   ============================================ */
+
+/* Ocean Blue Theme */
+:root.theme-ocean {
+    --primary: #0E7C86;
+    --secondary: #8DD3C7;
+    --accent: #006D7D;
+}
+
+/* Sunset Orange Theme */
+:root.theme-sunset {
+    --primary: #FF6B35;
+    --secondary: #F5B461;
+    --accent: #D62828;
+}
+
+/* Forest Green Theme */
+:root.theme-forest {
+    --primary: #2D6A4F;
+    --secondary: #52B788;
+    --accent: #1B4332;
+}
+
+/* Coral Pink Theme */
+:root.theme-coral {
+    --primary: #FF6B6B;
+    --secondary: #FFD66B;
+    --accent: #FF5252;
+}
+
+/* Deep Violet Theme */
+:root.theme-violet {
+    --primary: #8B5A8E;
+    --secondary: #DDB4DB;
+    --accent: #6A4C70;
+}
+
+/* ============================================
+   MODERN COLOR THEMES
+   ============================================ */
+
+/* Teal Modern Theme */
+:root.theme-teal {
+    --primary: #20B2AA;
+    --secondary: #48D1CC;
+    --accent: #008B8B;
+}
+
+/* Rose Gold Theme */
+:root.theme-rose {
+    --primary: #B76E79;
+    --secondary: #FDBCB4;
+    --accent: #9D4E6C;
+}
+
+/* Amber Theme */
+:root.theme-amber {
+    --primary: #FFA500;
+    --secondary: #FFD700;
+    --accent: #FF8C00;
+}
+
+/* Cyan Theme */
+:root.theme-cyan {
+    --primary: #00CED1;
+    --secondary: #E0FFFF;
+    --accent: #00BFFF;
+}
+
+/* Dark Mode Variables */
+.dark-mode {
+    --background: #1e1e1e;
+    --text-dark: #f5f5f5;
+}
+
+.dark-mode body {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+}
+
+.dark-mode .auth-card,
+.dark-mode .action-card,
+.dark-mode .ride-card,
+.dark-mode .host-form,
+.dark-mode .my-ride-card,
+.dark-mode .community-card,
+.dark-mode .profile-card {
+    background: #2a2a2a;
+    color: #f5f5f5;
+}
+
+.dark-mode .form-control {
+    background: #3a3a3a;
+    border-color: #4a4a4a;
+    color: #f5f5f5;
+}
+
+.dark-mode .form-control:focus {
+    background: #3a3a3a;
+    border-color: var(--primary);
+    color: #f5f5f5;
+}
+
+.dark-mode .bottom-nav {
+    background: #2a2a2a;
+    border-top-color: #4a4a4a;
+}
+
+.dark-mode .tab-btn {
+    background: #2a2a2a;
+    border-color: #4a4a4a;
+    color: #aaa;
+}
+
+.dark-mode .tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    min-height: 100vh;
+    color: var(--text-dark);
+}
+
+/* ============================================
+   AUTHENTICATION SECTION (PHASE 1)
+   ============================================ */
+
+#auth-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Logo Section */
+.logo-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 5px;
+}
+
+.logo-section p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    border: 2px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(168, 218, 220, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Switch Mode */
+.switch-mode {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.switch-mode a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.switch-mode a:hover {
+    color: var(--primary);
+}
+
+/* ============================================
+   SOCIAL LOGIN STYLES
+   ============================================ */
+
+.social-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    gap: 10px;
+}
+
+.social-divider::before,
+.social-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E8E8E8;
+}
+
+.social-divider span {
+    color: #999;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.social-login-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 2px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: var(--text-dark);
+}
+
+.btn-social:hover {
+    border-color: var(--primary);
+    background: #fafafa;
+    transform: translateY(-2px);
+}
+
+.btn-google {
+    color: #4285F4;
+}
+
+.btn-google:hover {
+    border-color: #4285F4;
+    background: #f0f4ff;
+}
+
+.btn-apple {
+    color: #000;
+}
+
+.btn-apple:hover {
+    border-color: #000;
+    background: #f5f5f5;
+}
+
+/* Phone Login Section */
+.phone-login-section {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.phone-login-section .btn-link {
+    color: var(--accent);
+    font-size: 0.85rem;
+    padding: 0;
+}
+
+.phone-login-section .btn-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* Phone Forms */
+#phone-login-form,
+#phone-verify-form {
+    transition: all 0.3s ease;
+}
+
+#phone-login-form.hidden,
+#phone-verify-form.hidden {
+    display: none !important;
+}
+
+/* reCAPTCHA Container */
+#recaptcha-container {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+#recaptcha-container iframe {
+    margin: 0 auto;
+}
+
+/* ============================================
+   ALERT STYLES
+   ============================================ */
+
+.alert {
+    border-radius: 12px;
+    border: none;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background-color: var(--success);
+    color: #2d5f4f;
+}
+
+.alert-danger {
+    background-color: #ffd4d4;
+    color: #d63031;
+}
+
+/* ============================================
+   APP CONTAINER (PHASE 2)
+   ============================================ */
+
+#app-container {
+    min-height: 100vh;
+    padding-bottom: 80px;
+    background: var(--background);
+}
+
+/* App Sections */
+.app-section {
+    display: none;
+    min-height: calc(100vh - 80px);
+    padding: 20px 0;
+    animation: fadeIn 0.4s ease;
+}
+
+.app-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Section Header */
+.section-header {
+    text-align: center;
+    padding: 20px 15px;
+    margin-bottom: 20px;
+}
+
+.welcome-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.welcome-subtitle {
+    color: #666;
+    font-size: 1rem;
+}
+
+.section-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.section-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* ============================================
+   HOME SECTION - QUICK ACTION CARDS
+   ============================================ */
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.action-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.action-card:active {
+    transform: translateY(-2px);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.action-card:nth-child(1) .card-icon {
+    background: linear-gradient(135deg, #A8DADC, #89C5C8);
+    color: white;
+}
+
+.action-card:nth-child(2) .card-icon {
+    background: linear-gradient(135deg, #FEC8D8, #FDB0C5);
+    color: white;
+}
+
+.action-card:nth-child(3) .card-icon {
+    background: linear-gradient(135deg, #CDB4DB, #B89DC9);
+    color: white;
+}
+
+.action-card:nth-child(4) .card-icon {
+    background: linear-gradient(135deg, #B8E0D2, #9DD4C3);
+    color: white;
+}
+
+.action-card:nth-child(5) .card-icon {
+    background: linear-gradient(135deg, #FFD6A5, #FFC785);
+    color: white;
+}
+
+.action-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 5px 0;
+}
+
+.action-card p {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0;
+}
+
+/* ============================================
+   PROFILE SECTION (PHASE 5)
+   ============================================ */
+
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.profile-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-card h6 {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.profile-card .form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(205, 180, 219, 0.4);
+}
+
+.form-select {
+    border: 2px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
+}
+
+/* Theme Preview Box */
+.theme-preview {
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.preview-box {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.preview-box::before,
+.preview-box::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.preview-box::before {
+    background: var(--primary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.preview-box::after {
+    background: var(--accent);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+    box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
+}
+
+.form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.logout-section {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 40px;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* ============================================
+   DISCOVER RIDES - RIDE CARDS (PHASE 3)
+   ============================================ */
+
+.ride-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.ride-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.4s ease;
+}
+
+.ride-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.ride-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+}
+
+.ride-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.ride-card-host {
+    font-size: 0.85rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ride-card-host i {
+    color: var(--accent);
+}
+
+.ride-card-desc {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.ride-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.ride-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.ride-detail i {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.ride-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.ride-participants {
+    font-size: 0.85rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-join {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-join:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(168, 218, 220, 0.4);
+}
+
+.btn-join:disabled {
+    background: linear-gradient(135deg, var(--success), #a0d0c0);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.btn-join:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* ============================================
+   HOST RIDE FORM (PHASE 3)
+   ============================================ */
+
+.host-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.host-form {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.host-form .form-control {
+    border: 2px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.host-form .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
+}
+
+.host-form textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.btn-host {
+    background: linear-gradient(135deg, var(--accent), var(--secondary));
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-host:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(205, 180, 219, 0.4);
+}
+
+/* ============================================
+   MY RIDES SECTION (PHASE 4)
+   ============================================ */
+
+.rides-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 0 15px;
+}
+
+.tab-btn {
+    background: white;
+    border: 2px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 10px 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #666;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    border-color: var(--accent);
+    color: white;
+}
+
+.my-rides-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.my-ride-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.4s ease;
+    position: relative;
+}
+
+.my-ride-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.ride-type-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.my-ride-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    padding-right: 80px;
+}
+
+.my-ride-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.my-ride-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.my-ride-detail i {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.my-ride-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.ride-status {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    border: none;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.empty-rides {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-rides i {
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.empty-rides p {
+    font-size: 1rem;
+}
+
+/* ============================================
+   COMMUNITY SECTION (PHASE 4)
+   ============================================ */
+
+.community-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.community-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.4s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.community-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.community-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.community-info {
+    flex: 1;
+}
+
+.community-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.community-bike {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.community-bike i {
+    color: var(--accent);
+}
+
+.community-city {
+    font-size: 0.85rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.community-city i {
+    color: var(--primary);
+}
+
+.btn-follow {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-follow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(168, 218, 220, 0.4);
+}
+
+.btn-follow:disabled {
+    background: linear-gradient(135deg, var(--success), #a0d0c0);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Success alert for ride actions */
+.ride-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success);
+    color: #2d5f4f;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ============================================
+   BOTTOM NAVIGATION BAR
+   ============================================ */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #E8E8E8;
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #999;
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 60px;
+}
+
+.nav-item i {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+    transition: all 0.3s ease;
+}
+
+.nav-item span {
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    color: var(--accent);
+}
+
+.nav-item.active {
+    color: var(--accent);
+}
+
+.nav-item.active i {
+    transform: scale(1.1);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.placeholder-content {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.placeholder-content p {
+    margin-top: 20px;
+    font-size: 1rem;
+}
+
+/* ============================================
+   DISCOVER RIDES SECTION
+   ============================================ */
+
+#ride-list {
+    animation: fadeIn 0.4s ease;
+}
+
+.ride-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.badge-public {
+    background: linear-gradient(135deg, var(--success), #a8e6d0);
+    color: white;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.ride-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.ride-info-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.ride-icon {
+    color: var(--primary);
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.ride-label {
+    font-size: 0.75rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 2px 0;
+    font-weight: 600;
+}
+
+.ride-value {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    margin: 0;
+    font-weight: 500;
+}
+
+.ride-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.ride-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ride-notification-success {
+    border-left: 4px solid var(--success);
+    color: var(--text-dark);
+}
+
+.ride-notification-error {
+    border-left: 4px solid #ff6b6b;
+    color: #ff6b6b;
+}
+
+.ride-notification-info {
+    border-left: 4px solid var(--primary);
+    color: var(--text-dark);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Maps preview & picker enhancements */
+.location-input-wrapper {
+    position: relative;
+}
+
+.location-input-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.location-input-actions .btn {
+    font-size: 0.85rem;
+}
+
+.map-preview {
+    background: #fff;
+    border: 1px solid #edf2f7;
+    border-radius: 18px;
+    padding: 18px;
+    margin-top: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+
+.map-preview.hidden {
+    display: none;
+}
+
+.map-preview-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.map-preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+#mapPreview {
+    width: 100%;
+    height: 280px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+}
+
+.map-stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+.map-note {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.map-preview.fullscreen {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92vw;
+    height: 85vh;
+    z-index: 1100;
+    padding: 22px;
+    border-radius: 24px;
+}
+
+.map-preview.fullscreen #mapPreview {
+    height: calc(85vh - 160px);
+}
+
+.map-preview.fullscreen .map-stats {
+    font-size: 1rem;
+}
+
+.map-close-btn {
+    color: #ff4d6d;
+    font-weight: 600;
+}
+
+.map-preview.fullscreen .map-close-btn {
+    display: inline-flex !important;
+}
+
+.map-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 12, 12, 0.55);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.map-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#distanceText,
+#durationText {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.ride-route-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.ride-route-line i {
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.ride-route-point {
+    background: #f1f5f9;
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.ride-meta {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.35rem;
+    margin-bottom: 0;
+}
+
+.ride-address {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin-bottom: 0;
+}
+
+/* Radius selector for Discover */
+#radiusSelect {
+    display: inline-block;
+    max-width: 140px;
+    border-radius: 8px;
+    border: 2px solid #E8E8E8;
+    padding: 8px 10px;
+    background: white;
+}
+
+@media (max-width: 576px) {
+    .action-card {
+        padding: 16px;
+    }
+    
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .action-card h3 {
+        font-size: 1rem;
+    }
+    
+    .action-card p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 375px) {
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .nav-item {
+        font-size: 0.7rem;
+        min-width: 50px;
+    }
+    
+    .nav-item i {
+        font-size: 1.3rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 800px;
+    }
+    
+    .action-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+    }
+    
+    .card-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+    
+    .ride-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .my-rides-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .community-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 992px) {
+    #app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .bottom-nav {
+        max-width: 1200px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px 20px 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+
+    .logo-section h1 {
+        font-size: 2rem;
+    }
+}

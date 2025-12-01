@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RevMate - Ride Together</title>
+  
+
+  <link rel="icon" type="image/png" href="/icons/app.png">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+
+  <!-- Meta Tags -->
+  <meta name="theme-color" content="#CDB4DB">
+  <meta name="description" content="Your riding companion - Find and host motorcycle rides">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/icons/app.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/icons/app.png">
+
+  <!-- Leaflet (OpenStreetMap) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+  <!-- External Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/rides.css">
+  <link rel="stylesheet" href="css/theme.css">
+
+  <!-- Service Worker Registration (for caching only) -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js")
+          .then((registration) => {
+            console.log("[SW] Service Worker registered:", registration.scope);
+          })
+          .catch((error) => {
+            console.error("[SW] Service Worker registration failed:", error);
+          });
+      });
+    }
+  </script>
+
+  <!-- Firebase SDK and app initialization are imported as ES modules from CDN
+     (modules are imported by `script.js` using relative module imports) -->
+</head>
+<body>
+
+  <!-- Authentication Section -->
+  <section id="auth-section">
+    <div class="auth-card">
+      <div class="logo-section">
+        <h1>🏍️ RevMate</h1>
+        <p>Your riding companion</p>
+      </div>
+
+      <!-- Alert Container -->
+      <div id="alert-container"></div>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        <div class="mb-3">
+          <label for="login-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="login-email" placeholder="Enter your email" required>
+        </div>
+        <div class="mb-3">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+
+      <!-- Social Login Options -->
+      <div class="social-divider">
+        <span>or continue with</span>
+      </div>
+            
+      <div class="social-login-buttons">
+        <button type="button" class="btn btn-social btn-google" id="login-google">
+          <i class="bi bi-google"></i> Google
+        </button>
+        <button type="button" class="btn btn-social btn-apple" id="login-apple">
+          <i class="bi bi-apple"></i> Apple
+        </button>
+      </div>
+
+      <div class="phone-login-section">
+        <button type="button" class="btn btn-link btn-sm" id="toggle-phone-login">
+          Sign in with Phone Number
+        </button>
+      </div>
+
+      <!-- Phone Authentication Form (Hidden by default) -->
+      <form id="phone-login-form" class="hidden">
+        <div class="mb-3">
+          <label for="phone-number" class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="phone-number" placeholder="+1 (555) 123-4567" required>
+          <small class="form-text text-muted">Include country code (e.g., +1 for USA)</small>
+        </div>
+        <div id="recaptcha-container" class="mb-3"></div>
+        <button type="submit" class="btn btn-primary w-100">Send Code</button>
+        <button type="button" class="btn btn-link btn-sm mt-2" id="toggle-phone-back">
+          Back to Email Login
+        </button>
+      </form>
+
+      <!-- Phone Verification Form (Hidden) -->
+      <form id="phone-verify-form" class="hidden">
+        <div class="mb-3">
+          <label for="verification-code" class="form-label">Verification Code</label>
+          <input type="text" class="form-control" id="verification-code" placeholder="000000" maxlength="6" required>
+          <small class="form-text text-muted">Enter the 6-digit code sent to your phone</small>
+        </div>
+        <div class="mb-3">
+          <label for="phone-name" class="form-label">Your Name</label>
+          <input type="text" class="form-control" id="phone-name" placeholder="Enter your name" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Verify & Login</button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signup-form" class="hidden">
+        <div class="mb-3">
+          <label for="signup-name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="signup-name" placeholder="Enter your name" required>
+        </div>
+        <div class="mb-3">
+          <label for="signup-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="signup-email" placeholder="Enter your email" required>
+        </div>
+        <div class="mb-3">
+          <label for="signup-password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="signup-password" placeholder="Create a password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+      </form>
+
+      <!-- Social Signup Options -->
+      <div class="social-divider hidden" id="signup-social-divider">
+        <span>or sign up with</span>
+      </div>
+            
+      <div class="social-login-buttons hidden" id="signup-social-buttons">
+        <button type="button" class="btn btn-social btn-google" id="signup-google">
+          <i class="bi bi-google"></i> Google
+        </button>
+        <button type="button" class="btn btn-social btn-apple" id="signup-apple">
+          <i class="bi bi-apple"></i> Apple
+        </button>
+      </div>
+
+      <!-- Switch Mode -->
+      <div class="switch-mode">
+        <span id="switch-text">Don't have an account? <a id="switch-link">Sign Up</a></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main App Container -->
+  <div id="app-container" class="hidden">
+        
+    <!-- Home Section -->
+    <section id="home" class="app-section active">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="welcome-title">Welcome, <span id="user-name-home">Rider</span> 👋</h2>
+          <p class="welcome-subtitle">Your next adventure starts here</p>
+        </div>
+
+        <div class="quick-actions">
+          <div class="action-card" data-section="discover">
+            <div class="card-icon">
+              <i class="bi bi-map"></i>
+            </div>
+            <div>
+              <h3>Discover Rides</h3>
+              <p>Find exciting routes and fellow riders</p>
+            </div>
+          </div>
+
+          <div class="action-card" data-section="host">
+            <div class="card-icon">
+              <i class="bi bi-plus-circle"></i>
+            </div>
+            <div>
+              <h3>Host a Ride</h3>
+              <p>Organize your own riding adventure</p>
+            </div>
+          </div>
+
+          <div class="action-card" data-section="myrides">
+            <div class="card-icon">
+              <i class="bi bi-list-check"></i>
+            </div>
+            <div>
+              <h3>My Rides</h3>
+              <p>Track your upcoming and past rides</p>
+            </div>
+          </div>
+
+          <div class="action-card" data-section="community">
+            <div class="card-icon">
+              <i class="bi bi-people"></i>
+            </div>
+            <div>
+              <h3>Community</h3>
+              <p>Connect with bikers in your area</p>
+            </div>
+          </div>
+
+          <div class="action-card" data-section="profile">
+            <div class="card-icon">
+              <i class="bi bi-person"></i>
+            </div>
+            <div>
+              <h3>Profile</h3>
+              <p>Manage your account and settings</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Discover Section -->
+    <section id="discover" class="app-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Discover Rides 🗺️</h2>
+          <p>Find your next adventure</p>
+        </div>
+                
+        <div id="discoverRides" class="row g-3"></div>
+                
+        <div id="empty-state" class="placeholder-content hidden">
+          <i class="bi bi-inbox" style="font-size: 4rem; color: var(--primary);"></i>
+          <p>No rides available yet. Be the first to host one!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Host Section -->
+    <section id="host" class="app-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Host a Ride 🏍️</h2>
+          <p>Create your own adventure</p>
+        </div>
+                
+        <div class="host-form-container">
+          <form id="hostRideForm" class="host-form" onsubmit="return false;">
+            <div class="mb-3">
+              <label for="rideTitle" class="form-label">Ride Title</label>
+              <input type="text" id="rideTitle" class="form-control" placeholder="e.g., Sunday Coastal Cruise" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="rideDateTime" class="form-label">Date & Time</label>
+              <input type="datetime-local" id="rideDateTime" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="startLocationInput" class="form-label">Start Location</label>
+              <div class="location-input-wrapper">
+                <input type="text" id="startLocationInput" class="form-control" placeholder="Search for start point (e.g., Gateway of India)" autocomplete="off" required>
+                <div class="location-input-actions">
+                  <button type="button" id="useCurrentLocation" class="btn btn-light btn-sm">
+                    <i class="bi bi-geo-alt-fill me-1"></i>Use My Location
+                  </button>
+                  <button type="button" id="startMapBtn" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-map me-1"></i>Select on Map
+                  </button>
+                </div>
+              </div>
+              <small class="text-muted">Type at least 3 letters, or place a pin on the map. Powered by OpenStreetMap data.</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="endLocationInput" class="form-label">Destination</label>
+              <div class="location-input-wrapper">
+                <input type="text" id="endLocationInput" class="form-control" placeholder="Search for destination (e.g., Lonavala Food Court)" autocomplete="off" required>
+                <div class="location-input-actions">
+                  <button type="button" id="endMapBtn" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-geo-fill me-1"></i>Select on Map
+                  </button>
+                </div>
+              </div>
+              <small class="text-muted">You can search any place that exists on Google Maps—businesses, homes, schools, and more.</small>
+            </div>
+
+            <div class="map-preview hidden" id="mapPreviewContainer">
+              <div class="map-preview-header">
+                <div>
+                  <h6>Route Preview</h6>
+                  <p class="text-muted mb-0">Click anywhere on the map, drag markers, or use search to refine locations.</p>
+                </div>
+                <div class="map-preview-controls">
+                  <div class="btn-group btn-group-sm" role="group" aria-label="Map mode toggle">
+                    <button type="button" class="btn btn-outline-secondary active" id="mapModeStart" data-mode="start">Set Start</button>
+                    <button type="button" class="btn btn-outline-secondary" id="mapModeEnd" data-mode="end">Set Destination</button>
+                  </div>
+                  <button type="button" id="expandMapBtn" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrows-fullscreen me-1"></i>Open Full Map
+                  </button>
+                  <button type="button" id="closeMapBtn" class="btn btn-link btn-sm map-close-btn d-none">
+                    <i class="bi bi-x-circle me-1"></i>Close
+                  </button>
+                </div>
+              </div>
+              <div id="mapPreview"></div>
+              <div class="map-stats">
+                <span id="distanceText">Distance: —</span>
+                <span id="durationText">Estimated Duration: —</span>
+              </div>
+              <p class="map-note text-muted mb-0">Maps powered by OpenStreetMap + OSRM. Coverage includes most buildings, businesses, homes, and schools.</p>
+            </div>
+
+            <div class="d-grid mt-4">
+              <button id="hostRideBtn" type="button" class="btn btn-host w-100">
+                <i class="bi bi-plus-circle me-2"></i>Host Ride
+              </button>
+            </div>
+          </form>
+          <div id="mapBackdrop" class="map-backdrop hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Rides Section -->
+    <section id="myrides" class="app-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>My Rides 📋</h2>
+          <p>Your riding history</p>
+        </div>
+                
+        <div class="rides-tabs">
+          <button class="tab-btn active" id="btnHosted" data-tab="hosted">
+            <i class="bi bi-flag-fill me-2"></i>Hosted
+          </button>
+          <button class="tab-btn" id="btnJoined" data-tab="joined">
+            <i class="bi bi-check-circle-fill me-2"></i>Joined
+          </button>
+        </div>
+                
+        <div id="myRidesContainer" class="my-rides-container"></div>
+      </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="app-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Community 👥</h2>
+          <p>Connect with riders</p>
+        </div>
+                
+        <div id="communityList" class="community-list"></div>
+                
+        <div id="community-empty-state" class="placeholder-content hidden">
+          <i class="bi bi-people" style="font-size: 4rem; color: var(--primary);"></i>
+          <p>No riders in your area yet</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile Section (PHASE 5) -->
+    <section id="profile" class="app-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Profile ⚙️</h2>
+          <p>Manage your account</p>
+        </div>
+                
+        <div class="profile-container">
+          <!-- User Information -->
+          <div class="profile-card">
+            <h6>User Information</h6>
+            <div class="mb-3">
+              <label for="profileName" class="form-label">Name</label>
+              <input type="text" id="profileName" class="form-control" placeholder="Your name">
+            </div>
+            <div class="mb-3">
+              <label for="profileEmail" class="form-label">Email</label>
+              <input type="email" id="profileEmail" class="form-control" disabled>
+            </div>
+            <button id="saveProfile" class="btn btn-save w-100">Save Changes</button>
+          </div>
+
+          <!-- Theme Customization -->
+          <div class="profile-card">
+            <h6>Theme Customization</h6>
+            <div class="mb-3">
+              <label for="themeSelect" class="form-label">Theme Color</label>
+              <select id="themeSelect" class="form-select">
+                <!-- Pastel Themes -->
+                <optgroup label="Pastel Colors">
+                  <option value="mint">🌿 Mint Dream</option>
+                  <option value="blush">🌸 Blush Rose</option>
+                  <option value="lavender">💜 Lavender</option>
+                  <option value="seafoam">🌊 Seafoam</option>
+                  <option value="peach">🍑 Peach</option>
+                </optgroup>
+                <!-- Vibrant Themes -->
+                <optgroup label="Vibrant Colors">
+                  <option value="ocean">🌀 Ocean Blue</option>
+                  <option value="sunset">🌅 Sunset Orange</option>
+                  <option value="forest">🌲 Forest Green</option>
+                  <option value="coral">🪸 Coral Pink</option>
+                  <option value="violet">✨ Deep Violet</option>
+                </optgroup>
+                <!-- Modern Themes -->
+                <optgroup label="Modern Colors">
+                  <option value="teal">Teal Modern</option>
+                  <option value="rose">Rose Gold</option>
+                  <option value="amber">Amber</option>
+                  <option value="cyan">Cyan</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="theme-preview mb-3">
+              <div class="preview-box" id="themePreview"></div>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="darkModeToggle">
+              <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+            </div>
+            <button id="saveTheme" class="btn btn-save w-100">Save Theme</button>
+          </div>
+
+          <!-- Logout -->
+          <div class="logout-section">
+            <button id="logoutBtn" class="btn btn-logout">
+              <i class="bi bi-box-arrow-right me-2"></i>Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active" data-section="home">
+        <i class="bi bi-house-fill"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="nav-item" data-section="discover">
+        <i class="bi bi-map"></i>
+        <span>Discover</span>
+      </a>
+      <a href="#" class="nav-item" data-section="host">
+        <i class="bi bi-plus-circle"></i>
+        <span>Host</span>
+      </a>
+      <a href="#" class="nav-item" data-section="myrides">
+        <i class="bi bi-list-check"></i>
+        <span>My Rides</span>
+      </a>
+      <a href="#" class="nav-item" data-section="profile">
+        <i class="bi bi-person"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script type="module" src="js/script.js"></script>
+</body>
+</html>
