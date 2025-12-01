@@ -1616,8 +1616,8 @@ body {
     /* Hidden by default (desktop) */
     position: fixed;
     top: 15px;
-    right: 15px;
-    z-index: 1001;
+    left: 15px;
+    z-index: 998;
     background: var(--primary);
     border: none;
     border-radius: 50%;
