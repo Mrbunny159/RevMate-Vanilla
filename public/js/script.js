@@ -65,7 +65,7 @@ function saveData(key, data) {
 function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
     if (!alertContainer) return;
-    
+
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
     alert.textContent = message;
@@ -81,12 +81,12 @@ function showAlert(message, type = 'success') {
 function showRideAlert(message) {
     const existingAlert = document.querySelector('.ride-alert');
     if (existingAlert) existingAlert.remove();
-    
+
     const alert = document.createElement('div');
     alert.className = 'ride-alert';
     alert.textContent = message;
     document.body.appendChild(alert);
-    
+
     setTimeout(() => {
         alert.style.animation = 'fadeOut 0.3s ease';
         setTimeout(() => alert.remove(), 300);
@@ -204,18 +204,18 @@ const THEME_COLORS = {
 
 function applyTheme(themeName) {
     const theme = THEME_COLORS[themeName] || THEME_COLORS.mint;
-    
+
     // Apply theme class to root
     document.documentElement.classList.remove(
         ...Object.keys(THEME_COLORS).map(t => `theme-${t}`)
     );
     document.documentElement.classList.add(`theme-${themeName}`);
-    
+
     // Apply CSS variables for immediate effect
     document.documentElement.style.setProperty('--primary', theme.primary);
     document.documentElement.style.setProperty('--secondary', theme.secondary);
     document.documentElement.style.setProperty('--accent', theme.accent);
-    
+
     // Update preview
     updateThemePreview(theme);
 }
@@ -230,7 +230,7 @@ function updateThemePreview(theme) {
 
 function applySavedTheme() {
     const themeSettings = getData('themeSettings');
-    
+
     if (themeSettings && themeSettings.theme) {
         // Apply selected theme
         applyTheme(themeSettings.theme);
@@ -238,7 +238,7 @@ function applySavedTheme() {
         // Apply default theme
         applyTheme('mint');
     }
-    
+
     // Apply dark mode
     if (themeSettings && themeSettings.darkMode) {
         document.body.classList.add('dark-mode');
@@ -250,34 +250,34 @@ function applySavedTheme() {
 function saveThemeSettings() {
     const themeName = document.getElementById('themeSelect').value;
     const darkMode = document.getElementById('darkModeToggle').checked;
-    
+
     const themeSettings = {
         theme: themeName,
         darkMode: darkMode
     };
-    
+
     saveData('themeSettings', themeSettings);
-    
+
     // Apply immediately
     applyTheme(themeName);
-    
+
     if (darkMode) {
         document.body.classList.add('dark-mode');
     } else {
         document.body.classList.remove('dark-mode');
     }
-    
+
     showRideAlert('✨ Theme saved successfully!');
 }
 
 function loadProfileData() {
     const currentUser = getData('currentUser');
-    
+
     if (currentUser) {
         document.getElementById('profileName').value = currentUser.name || '';
         document.getElementById('profileEmail').value = currentUser.email || '';
     }
-    
+
     // Load theme settings
     const themeSettings = getData('themeSettings');
     if (themeSettings) {
@@ -294,20 +294,20 @@ function loadProfileData() {
 
 function saveProfileData() {
     const currentUser = getData('currentUser');
-    
+
     if (!currentUser) return;
-    
+
     const newName = document.getElementById('profileName').value.trim();
-    
+
     if (!newName) {
         showRideAlert('Please enter a valid name');
         return;
     }
-    
+
     // Update current user
     currentUser.name = newName;
     saveData('currentUser', currentUser);
-    
+
     // Update in users array
     const users = getData('users');
     const userIndex = users.findIndex(u => u.id === currentUser.id);
@@ -315,13 +315,13 @@ function saveProfileData() {
         users[userIndex].name = newName;
         saveData('users', users);
     }
-    
+
     // Update name display in home
     const userNameHome = document.getElementById('user-name-home');
     if (userNameHome) {
         userNameHome.textContent = newName;
     }
-    
+
     showRideAlert('Profile updated successfully!');
 }
 
@@ -367,12 +367,12 @@ const defaultRides = [
 
 function getRides() {
     let rides = getData('rides');
-    
+
     if (!rides || rides.length === 0) {
         rides = defaultRides;
         saveRides(rides);
     }
-    
+
     return rides;
 }
 
@@ -382,11 +382,11 @@ function saveRides(rides) {
 
 function formatDate(dateString) {
     const date = new Date(dateString);
-    const options = { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric', 
-        hour: '2-digit', 
+    const options = {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
         minute: '2-digit'
     };
     return date.toLocaleDateString('en-IN', options);
@@ -411,30 +411,30 @@ async function refreshDiscoverRides() {
 
 function initHostRideForm() {
     const hostForm = document.getElementById('hostRideForm');
-    
+
     if (!hostForm) return;
-    
+
     hostForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         const currentUser = getData('currentUser');
-        
+
         if (!currentUser) {
             showRideAlert('Please login to host rides');
             return;
         }
-        
+
         const title = document.getElementById('rideTitle').value.trim();
         const desc = document.getElementById('rideDesc').value.trim();
         const start = document.getElementById('rideStart').value.trim();
         const dest = document.getElementById('rideDest').value.trim();
         const date = document.getElementById('rideDate').value;
-        
+
         if (!title || !desc || !start || !dest || !date) {
             showRideAlert('Please fill in all fields');
             return;
         }
-        
+
         const newRide = {
             id: Date.now(),
             title: title,
@@ -446,14 +446,14 @@ function initHostRideForm() {
             hostId: currentUser.id,
             joinedUsers: []
         };
-        
+
         const rides = getRides();
         rides.push(newRide);
         saveRides(rides);
-        
+
         hostForm.reset();
         showRideAlert('Ride created successfully!');
-        
+
         setTimeout(() => {
             showSection('discover');
         }, 1000);
@@ -472,7 +472,7 @@ function renderMyRides(type = 'hosted') {
      * This function is now just to switch between tabs
      */
     currentRideTab = type;
-    
+
     // Stop old listener
     if (type === 'hosted') {
         stopJoinedListener();
@@ -508,15 +508,15 @@ async function leaveRideHandler(rideId) {
 function initMyRidesTabs() {
     const hostedBtn = document.getElementById('btnHosted');
     const joinedBtn = document.getElementById('btnJoined');
-    
+
     if (!hostedBtn || !joinedBtn) return;
-    
+
     hostedBtn.addEventListener('click', () => {
         hostedBtn.classList.add('active');
         joinedBtn.classList.remove('active');
         renderMyRides('hosted');
     });
-    
+
     joinedBtn.addEventListener('click', () => {
         joinedBtn.classList.add('active');
         hostedBtn.classList.remove('active');
@@ -541,12 +541,12 @@ const defaultCommunity = [
 
 function getCommunity() {
     let community = getData('community');
-    
+
     if (!community || community.length === 0) {
         community = defaultCommunity;
         saveCommunity(community);
     }
-    
+
     return community;
 }
 
@@ -563,7 +563,7 @@ function getAvatarColor(name) {
         'linear-gradient(135deg, #FFD6A5, #FFC785)',
         'linear-gradient(135deg, #CAFFBF, #B3F0A8)'
     ];
-    
+
     const index = name.charCodeAt(0) % colors.length;
     return colors[index];
 }
@@ -571,34 +571,34 @@ function getAvatarColor(name) {
 function renderCommunity() {
     const container = document.getElementById('communityList');
     const emptyState = document.getElementById('community-empty-state');
-    
+
     if (!container) return;
-    
+
     const community = getCommunity();
     const currentUser = getData('currentUser');
-    
+
     if (!currentUser) {
         container.innerHTML = '<div class="empty-rides"><p>Please login to view community</p></div>';
         return;
     }
-    
+
     if (!currentUser.following) {
         currentUser.following = [];
         saveData('currentUser', currentUser);
     }
-    
+
     if (community.length === 0) {
         container.innerHTML = '';
         if (emptyState) emptyState.classList.remove('hidden');
         return;
     }
-    
+
     if (emptyState) emptyState.classList.add('hidden');
-    
+
     container.innerHTML = community.map(member => {
         const isFollowing = currentUser.following.includes(member.id);
         const initials = member.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-        
+
         return `
             <div class="community-card">
                 <div class="community-avatar" style="background: ${getAvatarColor(member.name)}">
@@ -623,7 +623,7 @@ function renderCommunity() {
             </div>
         `;
     }).join('');
-    
+
     const followButtons = container.querySelectorAll('.btn-follow:not([disabled])');
     followButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -635,29 +635,29 @@ function renderCommunity() {
 
 function followMember(memberId) {
     const currentUser = getData('currentUser');
-    
+
     if (!currentUser) {
         showRideAlert('Please login to follow riders');
         return;
     }
-    
+
     const community = getCommunity();
     const member = community.find(m => m.id === memberId);
-    
+
     if (!member) {
         showRideAlert('Member not found');
         return;
     }
-    
+
     if (!currentUser.following) {
         currentUser.following = [];
     }
-    
+
     if (currentUser.following.includes(memberId)) {
         showRideAlert('Already following this rider');
         return;
     }
-    
+
     currentUser.following.push(memberId);
     saveData('currentUser', currentUser);
     renderCommunity();
@@ -670,7 +670,7 @@ function followMember(memberId) {
 
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
-    
+
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
     const switchText = document.getElementById('switch-text');
@@ -678,16 +678,16 @@ function toggleAuthMode() {
     const loginSocialButtons = document.querySelector('.social-login-buttons');
     const signupSocialDiv = document.getElementById('signup-social-divider');
     const signupSocialButtons = document.getElementById('signup-social-buttons');
-    
+
     if (isLoginMode) {
         signupForm.classList.add('hidden');
         loginForm.classList.remove('hidden');
         switchText.innerHTML = 'Don\'t have an account? <a id="switch-link">Sign Up</a>';
-        
+
         // Show login social options
         loginSocialDiv.classList.remove('hidden');
         loginSocialButtons.classList.remove('hidden');
-        
+
         // Hide signup social options
         signupSocialDiv.classList.add('hidden');
         signupSocialButtons.classList.add('hidden');
@@ -695,19 +695,19 @@ function toggleAuthMode() {
         loginForm.classList.add('hidden');
         signupForm.classList.remove('hidden');
         switchText.innerHTML = 'Already have an account? <a id="switch-link">Login</a>';
-        
+
         // Hide login social options
         loginSocialDiv.classList.add('hidden');
         loginSocialButtons.classList.add('hidden');
-        
+
         // Show signup social options
         signupSocialDiv.classList.remove('hidden');
         signupSocialButtons.classList.remove('hidden');
     }
-    
+
     document.getElementById('switch-link').addEventListener('click', toggleAuthMode);
     document.getElementById('alert-container').innerHTML = '';
-    
+
     // Re-setup social login buttons after toggling mode
     setTimeout(() => {
         setupSocialLoginButtons();
@@ -720,7 +720,7 @@ function toggleAuthMode() {
 
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const name = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value.trim();
@@ -731,10 +731,10 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     }
 
     const result = await registerUser(email, password, name);
-    
+
     if (result.success) {
         showAlert('Account created successfully!', 'success');
-        
+
         setTimeout(() => {
             redirectToApp();
         }, 1000);
@@ -749,7 +749,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value.trim();
 
@@ -762,7 +762,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     if (result.success) {
         showAlert('Login successful!', 'success');
-        
+
         setTimeout(() => {
             redirectToApp();
         }, 800);
@@ -780,11 +780,11 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
  */
 async function handleGoogleAuth() {
     console.log('🔐 Google Auth clicked');
-    
+
     try {
         const result = await loginWithGoogle();
         console.log('Google auth result:', result);
-        
+
         if (result.success && result.user) {
             // Save user data and redirect to app
             saveData('currentUser', result.user);
@@ -806,11 +806,11 @@ async function handleGoogleAuth() {
  */
 async function handleAppleAuth() {
     console.log('🔐 Apple Auth clicked');
-    
+
     try {
         const result = await loginWithApple();
         console.log('Apple auth result:', result);
-        
+
         if (result.success && result.user) {
             // Save user data and redirect to app
             saveData('currentUser', result.user);
@@ -848,7 +848,7 @@ function setupSocialLoginButtons() {
     } else {
         console.warn('⚠️ Google login button not found');
     }
-    
+
     // Google signup button
     const signupGoogleBtn = document.getElementById('signup-google');
     if (signupGoogleBtn) {
@@ -866,7 +866,7 @@ function setupSocialLoginButtons() {
     } else {
         console.warn('⚠️ Google signup button not found');
     }
-    
+
     // Apple login button
     const loginAppleBtn = document.getElementById('login-apple');
     if (loginAppleBtn) {
@@ -882,7 +882,7 @@ function setupSocialLoginButtons() {
         });
         console.log('✅ Apple login button handler attached');
     }
-    
+
     // Apple signup button
     const signupAppleBtn = document.getElementById('signup-apple');
     if (signupAppleBtn) {
@@ -909,7 +909,7 @@ document.addEventListener('click', async (e) => {
         await handleGoogleAuth();
         return;
     }
-    
+
     // Google signup button (fallback)
     if (e.target.closest('#signup-google')) {
         e.preventDefault();
@@ -917,7 +917,7 @@ document.addEventListener('click', async (e) => {
         await handleGoogleAuth();
         return;
     }
-    
+
     // Apple login button (fallback)
     if (e.target.closest('#login-apple')) {
         e.preventDefault();
@@ -925,7 +925,7 @@ document.addEventListener('click', async (e) => {
         await handleAppleAuth();
         return;
     }
-    
+
     // Apple signup button (fallback)
     if (e.target.closest('#signup-apple')) {
         e.preventDefault();
@@ -972,26 +972,26 @@ if (togglePhoneBackBtn) {
 if (phoneLoginForm) {
     phoneLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const phoneNumber = document.getElementById('phone-number').value.trim();
-        
+
         if (!phoneNumber) {
             showAlert('Please enter a phone number', 'danger');
             return;
         }
-        
+
         try {
             // Setup reCAPTCHA
             const appVerifier = setupRecaptcha('recaptcha-container');
-            
+
             if (!appVerifier) {
                 showAlert('reCAPTCHA setup failed', 'danger');
                 return;
             }
-            
+
             // Send verification code
             const result = await sendPhoneVerificationCode(phoneNumber, appVerifier);
-            
+
             if (result.success) {
                 confirmationResult = result.confirmationResult;
                 phoneLoginForm.classList.add('hidden');
@@ -1013,25 +1013,25 @@ if (phoneLoginForm) {
 if (phoneVerifyForm) {
     phoneVerifyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const verificationCode = document.getElementById('verification-code').value.trim();
         const phoneName = document.getElementById('phone-name').value.trim() || 'Phone User';
-        
+
         if (!verificationCode) {
             showAlert('Please enter the verification code', 'danger');
             return;
         }
-        
+
         if (!confirmationResult) {
             showAlert('Please request a verification code first', 'danger');
             return;
         }
-        
+
         const result = await verifyPhoneCode(confirmationResult, verificationCode, phoneName);
-        
+
         if (result.success) {
             showAlert('Login successful!', 'success');
-            
+
             setTimeout(() => {
                 redirectToApp();
             }, 800);
@@ -1047,16 +1047,16 @@ if (phoneVerifyForm) {
 
 function redirectToApp() {
     const currentUser = getData('currentUser');
-    
+
     if (currentUser && currentUser.name) {
         const userNameHome = document.getElementById('user-name-home');
         if (userNameHome) {
             userNameHome.textContent = currentUser.name;
         }
-        
+
         document.getElementById('auth-section').classList.add('hidden');
         document.getElementById('app-container').classList.remove('hidden');
-        
+
         initNavigation();
     }
 }
@@ -1070,12 +1070,12 @@ function showSection(sectionId) {
     allSections.forEach(section => {
         section.classList.remove('active');
     });
-    
+
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.classList.add('active');
     }
-    
+
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.classList.remove('active');
@@ -1083,9 +1083,9 @@ function showSection(sectionId) {
             item.classList.add('active');
         }
     });
-    
+
     saveData('lastSection', sectionId);
-    
+
     // Handle section-specific initialization
     if (sectionId === 'discover') {
         console.log('📍 Loading Discover Rides...');
@@ -1105,9 +1105,75 @@ function showSection(sectionId) {
     }
 }
 
+// ============================================
+// HAMBURGER MENU
+// ============================================
+
+function initHamburgerMenu() {
+    const hamburgerToggle = document.getElementById('hamburgerToggle');
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const hamburgerOverlay = document.getElementById('hamburgerOverlay');
+    const menuClose = document.getElementById('menuClose');
+    const menuItems = document.querySelectorAll('.menu-item[data-section]');
+    const menuLogout = document.getElementById('menuLogout');
+
+    if (!hamburgerToggle || !hamburgerMenu) return;
+
+    // Toggle menu
+    function openMenu() {
+        hamburgerMenu.classList.add('active');
+        hamburgerOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+    }
+
+    function closeMenu() {
+        hamburgerMenu.classList.remove('active');
+        hamburgerOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    hamburgerToggle.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    hamburgerOverlay.addEventListener('click', closeMenu);
+
+    // Menu item clicks
+    menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const sectionId = item.getAttribute('data-section');
+            showSection(sectionId);
+            closeMenu();
+            updateMenuActiveState(sectionId);
+        });
+    });
+
+    // Logout click
+    if (menuLogout) {
+        menuLogout.addEventListener('click', () => {
+            closeMenu();
+            handleLogout();
+        });
+    }
+
+    // Update active state
+    function updateMenuActiveState(activeSectionId) {
+        menuItems.forEach(item => {
+            if (item.getAttribute('data-section') === activeSectionId) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    // Initial active state
+    const currentSection = getData('lastSection') || 'home';
+    updateMenuActiveState(currentSection);
+}
+
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
-    
+
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1115,7 +1181,7 @@ function initNavigation() {
             showSection(sectionId);
         });
     });
-    
+
     const actionCards = document.querySelectorAll('.action-card');
     actionCards.forEach(card => {
         card.addEventListener('click', () => {
@@ -1123,10 +1189,11 @@ function initNavigation() {
             showSection(sectionId);
         });
     });
-    
+
     initHostRideForm();
     initMyRidesTabs();
-    
+    initHamburgerMenu();
+
     const lastSection = getData('lastSection');
     if (lastSection) {
         showSection(lastSection);
@@ -1142,20 +1209,20 @@ function initNavigation() {
 async function handleLogout() {
     // Stop all real-time listeners before logging out
     stopAllListeners();
-    
+
     const result = await logoutUser();
-    
+
     if (result.success) {
         document.getElementById('login-form').reset();
         document.getElementById('signup-form').reset();
-        
+
         document.getElementById('app-container').classList.add('hidden');
         document.getElementById('auth-section').classList.remove('hidden');
-        
+
         if (!isLoginMode) {
             toggleAuthMode();
         }
-        
+
         showAlert('Logged out successfully', 'success');
     } else {
         showAlert(result.error, 'danger');
@@ -1169,21 +1236,21 @@ async function handleLogout() {
 function initApp() {
     // Apply saved theme on load
     applySavedTheme();
-    
+
     // Setup social login buttons
     setupSocialLoginButtons();
-    
+
     // Process OAuth redirect result (no longer needed for popup-only flow)
     processAuthRedirect().catch(err => {
         console.error('Error processing auth redirect:', err);
     });
-    
+
     // Initialize Profile section event listeners
     const saveProfileBtn = document.getElementById('saveProfile');
     if (saveProfileBtn) {
         saveProfileBtn.addEventListener('click', saveProfileData);
     }
-    
+
     const themeSelect = document.getElementById('themeSelect');
     if (themeSelect) {
         // Show preview when theme is selected
@@ -1192,24 +1259,24 @@ function initApp() {
             updateThemePreview(selectedTheme);
         });
     }
-    
+
     const saveThemeBtn = document.getElementById('saveTheme');
     if (saveThemeBtn) {
         saveThemeBtn.addEventListener('click', saveThemeSettings);
     }
-    
+
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
     }
-    
+
     // Monitor Firebase authentication state
     onAuthChange(async (user) => {
         if (user) {
             // User is logged in
             const userId = user.uid;
             const userName = user.displayName || user.email || 'User';
-            
+
             // Store current user in localStorage for quick access
             const currentUser = {
                 id: userId,
@@ -1219,19 +1286,19 @@ function initApp() {
             };
             saveData('currentUser', currentUser);
             // Also keep a convenient uid key used by host/join fallbacks
-            try { localStorage.setItem('uid', userId); } catch (e) {}
-            
+            try { localStorage.setItem('uid', userId); } catch (e) { }
+
             // Show app and hide auth
             const userNameHome = document.getElementById('user-name-home');
             if (userNameHome) {
                 userNameHome.textContent = userName;
             }
-            
+
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
-            
+
             initNavigation();
-            
+
             // Initialize real-time listeners for Discover Rides
             console.log('🔔 Starting real-time Discover Rides listener...');
             startDiscoverListener();
@@ -1239,11 +1306,11 @@ function initApp() {
             // User is logged out
             console.log('🔔 Stopping all real-time listeners...');
             stopAllListeners();
-            
+
             localStorage.removeItem('currentUser');
             localStorage.removeItem('lastSection');
-            try { localStorage.removeItem('uid'); } catch (e) {}
-            
+            try { localStorage.removeItem('uid'); } catch (e) { }
+
             document.getElementById('app-container').classList.add('hidden');
             document.getElementById('auth-section').classList.remove('hidden');
         }

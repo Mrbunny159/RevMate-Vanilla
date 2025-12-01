@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RevMate - Ride Together</title>
-  
+
 
   <link rel="icon" type="image/png" href="/icons/app.png">
-<link rel="icon" href="/icons/icon-192.png">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
 
   <!-- Meta Tags -->
   <meta name="theme-color" content="#CDB4DB">
   <meta name="description" content="Your riding companion - Find and host motorcycle rides">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/icons/app.png">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/icons/app.png">
 
   <!-- Leaflet (OpenStreetMap) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-    
+
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    
+
   <!-- Bootstrap Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
-    
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+    rel="stylesheet">
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
   <!-- External Stylesheets -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/rides.css">
@@ -56,6 +58,7 @@
   <!-- Firebase SDK and app initialization are imported as ES modules from CDN
      (modules are imported by `script.js` using relative module imports) -->
 </head>
+
 <body>
 
   <!-- Authentication Section -->
@@ -86,7 +89,7 @@
       <div class="social-divider">
         <span>or continue with</span>
       </div>
-            
+
       <div class="social-login-buttons">
         <button type="button" class="btn btn-social btn-google" id="login-google">
           <i class="bi bi-google"></i> Google
@@ -151,7 +154,7 @@
       <div class="social-divider hidden" id="signup-social-divider">
         <span>or sign up with</span>
       </div>
-            
+
       <div class="social-login-buttons hidden" id="signup-social-buttons">
         <button type="button" class="btn btn-social btn-google" id="signup-google">
           <i class="bi bi-google"></i> Google
@@ -170,7 +173,52 @@
 
   <!-- Main App Container -->
   <div id="app-container" class="hidden">
-        
+
+    <!-- Hamburger Menu Button (Mobile Only) -->
+    <button class="hamburger-toggle" id="hamburgerToggle" aria-label="Menu">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Hamburger Menu Overlay -->
+    <div class="hamburger-overlay" id="hamburgerOverlay"></div>
+
+    <!-- Hamburger Menu (Slide from Left) -->
+    <nav class="hamburger-menu" id="hamburgerMenu">
+      <div class="menu-header">
+        <h3>Menu</h3>
+        <button class="menu-close" id="menuClose" aria-label="Close menu">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <ul class="menu-items">
+        <li class="menu-item" data-section="discover">
+          <i class="bi bi-map"></i>
+          <span>Discover Rides</span>
+        </li>
+        <li class="menu-item" data-section="host">
+          <i class="bi bi-plus-circle"></i>
+          <span>Host a Ride</span>
+        </li>
+        <li class="menu-item" data-section="myrides">
+          <i class="bi bi-list-check"></i>
+          <span>My Rides</span>
+        </li>
+        <li class="menu-item" data-section="community">
+          <i class="bi bi-people"></i>
+          <span>Community</span>
+        </li>
+        <li class="menu-item" data-section="profile">
+          <i class="bi bi-person"></i>
+          <span>Profile</span>
+        </li>
+        <li class="menu-item menu-logout" id="menuLogout">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </li>
+      </ul>
+    </nav>
+
     <!-- Home Section -->
     <section id="home" class="app-section active">
       <div class="container">
@@ -179,7 +227,7 @@
           <p class="welcome-subtitle">Your next adventure starts here</p>
         </div>
 
-        <div class="quick-actions">
+        <div class="quick-actions desktop-only">
           <div class="action-card" data-section="discover">
             <div class="card-icon">
               <i class="bi bi-map"></i>
@@ -240,9 +288,9 @@
           <h2>Discover Rides 🗺️</h2>
           <p>Find your next adventure</p>
         </div>
-                
+
         <div id="discoverRides" class="row g-3"></div>
-                
+
         <div id="empty-state" class="placeholder-content hidden">
           <i class="bi bi-inbox" style="font-size: 4rem; color: var(--primary);"></i>
           <p>No rides available yet. Be the first to host one!</p>
@@ -257,7 +305,7 @@
           <h2>Host a Ride 🏍️</h2>
           <p>Create your own adventure</p>
         </div>
-                
+
         <div class="host-form-container">
           <form id="hostRideForm" class="host-form" onsubmit="return false;">
             <div class="mb-3">
@@ -273,7 +321,8 @@
             <div class="mb-3">
               <label for="startLocationInput" class="form-label">Start Location</label>
               <div class="location-input-wrapper">
-                <input type="text" id="startLocationInput" class="form-control" placeholder="Search for start point (e.g., Gateway of India)" autocomplete="off" required>
+                <input type="text" id="startLocationInput" class="form-control"
+                  placeholder="Search for start point (e.g., Gateway of India)" autocomplete="off" required>
                 <div class="location-input-actions">
                   <button type="button" id="useCurrentLocation" class="btn btn-light btn-sm">
                     <i class="bi bi-geo-alt-fill me-1"></i>Use My Location
@@ -283,32 +332,38 @@
                   </button>
                 </div>
               </div>
-              <small class="text-muted">Type at least 3 letters, or place a pin on the map. Powered by OpenStreetMap data.</small>
+              <small class="text-muted">Type at least 3 letters, or place a pin on the map. Powered by OpenStreetMap
+                data.</small>
             </div>
 
             <div class="mb-3">
               <label for="endLocationInput" class="form-label">Destination</label>
               <div class="location-input-wrapper">
-                <input type="text" id="endLocationInput" class="form-control" placeholder="Search for destination (e.g., Lonavala Food Court)" autocomplete="off" required>
+                <input type="text" id="endLocationInput" class="form-control"
+                  placeholder="Search for destination (e.g., Lonavala Food Court)" autocomplete="off" required>
                 <div class="location-input-actions">
                   <button type="button" id="endMapBtn" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-geo-fill me-1"></i>Select on Map
                   </button>
                 </div>
               </div>
-              <small class="text-muted">You can search any place that exists on Google Maps—businesses, homes, schools, and more.</small>
+              <small class="text-muted">You can search any place that exists on Google Maps—businesses, homes, schools,
+                and more.</small>
             </div>
 
             <div class="map-preview hidden" id="mapPreviewContainer">
               <div class="map-preview-header">
                 <div>
                   <h6>Route Preview</h6>
-                  <p class="text-muted mb-0">Click anywhere on the map, drag markers, or use search to refine locations.</p>
+                  <p class="text-muted mb-0">Click anywhere on the map, drag markers, or use search to refine locations.
+                  </p>
                 </div>
                 <div class="map-preview-controls">
                   <div class="btn-group btn-group-sm" role="group" aria-label="Map mode toggle">
-                    <button type="button" class="btn btn-outline-secondary active" id="mapModeStart" data-mode="start">Set Start</button>
-                    <button type="button" class="btn btn-outline-secondary" id="mapModeEnd" data-mode="end">Set Destination</button>
+                    <button type="button" class="btn btn-outline-secondary active" id="mapModeStart"
+                      data-mode="start">Set Start</button>
+                    <button type="button" class="btn btn-outline-secondary" id="mapModeEnd" data-mode="end">Set
+                      Destination</button>
                   </div>
                   <button type="button" id="expandMapBtn" class="btn btn-outline-dark btn-sm">
                     <i class="bi bi-arrows-fullscreen me-1"></i>Open Full Map
@@ -323,7 +378,8 @@
                 <span id="distanceText">Distance: —</span>
                 <span id="durationText">Estimated Duration: —</span>
               </div>
-              <p class="map-note text-muted mb-0">Maps powered by OpenStreetMap + OSRM. Coverage includes most buildings, businesses, homes, and schools.</p>
+              <p class="map-note text-muted mb-0">Maps powered by OpenStreetMap + OSRM. Coverage includes most
+                buildings, businesses, homes, and schools.</p>
             </div>
 
             <div class="d-grid mt-4">
@@ -344,7 +400,7 @@
           <h2>My Rides 📋</h2>
           <p>Your riding history</p>
         </div>
-                
+
         <div class="rides-tabs">
           <button class="tab-btn active" id="btnHosted" data-tab="hosted">
             <i class="bi bi-flag-fill me-2"></i>Hosted
@@ -353,7 +409,7 @@
             <i class="bi bi-check-circle-fill me-2"></i>Joined
           </button>
         </div>
-                
+
         <div id="myRidesContainer" class="my-rides-container"></div>
       </div>
     </section>
@@ -365,9 +421,9 @@
           <h2>Community 👥</h2>
           <p>Connect with riders</p>
         </div>
-                
+
         <div id="communityList" class="community-list"></div>
-                
+
         <div id="community-empty-state" class="placeholder-content hidden">
           <i class="bi bi-people" style="font-size: 4rem; color: var(--primary);"></i>
           <p>No riders in your area yet</p>
@@ -382,7 +438,7 @@
           <h2>Profile ⚙️</h2>
           <p>Manage your account</p>
         </div>
-                
+
         <div class="profile-container">
           <!-- User Information -->
           <div class="profile-card">
@@ -479,4 +535,5 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script type="module" src="js/script.js"></script>
 </body>
+
 </html>

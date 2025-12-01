@@ -217,6 +217,7 @@ body {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -433,6 +434,7 @@ body {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -472,11 +474,12 @@ body {
 }
 
 @keyframes fadeIn {
-    from { 
+    from {
         opacity: 0;
         transform: translateY(10px);
     }
-    to { 
+
+    to {
         opacity: 1;
         transform: translateY(0);
     }
@@ -688,8 +691,7 @@ body {
     background: var(--accent);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-    box-shadow: 0 0 0 0.2rem rgba(168, 218, 220, 0.25);
-}
+
 
 .form-check-input {
     width: 3rem;
@@ -1170,6 +1172,7 @@ body {
         opacity: 0;
         transform: translateX(100px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -1517,17 +1520,17 @@ body {
     .action-card {
         padding: 16px;
     }
-    
+
     .card-icon {
         width: 50px;
         height: 50px;
         font-size: 1.5rem;
     }
-    
+
     .action-card h3 {
         font-size: 1rem;
     }
-    
+
     .action-card p {
         font-size: 0.8rem;
     }
@@ -1537,12 +1540,12 @@ body {
     .welcome-title {
         font-size: 1.5rem;
     }
-    
+
     .nav-item {
         font-size: 0.7rem;
         min-width: 50px;
     }
-    
+
     .nav-item i {
         font-size: 1.3rem;
     }
@@ -1553,27 +1556,27 @@ body {
         grid-template-columns: repeat(2, 1fr);
         max-width: 800px;
     }
-    
+
     .action-card {
         flex-direction: column;
         text-align: center;
         padding: 30px 20px;
     }
-    
+
     .card-icon {
         width: 70px;
         height: 70px;
         font-size: 2rem;
     }
-    
+
     .ride-list {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .my-rides-container {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .community-list {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1584,7 +1587,7 @@ body {
         max-width: 1200px;
         margin: 0 auto;
     }
-    
+
     .bottom-nav {
         max-width: 1200px;
         left: 50%;
@@ -1600,5 +1603,221 @@ body {
 
     .logo-section h1 {
         font-size: 2rem;
+    }
+}
+
+/* ============================================
+   HAMBURGER MENU (MOBILE ONLY)
+   ============================================ */
+
+/* Hamburger Toggle Button */
+.hamburger-toggle {
+    display: none;
+    /* Hidden by default (desktop) */
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1001;
+    background: var(--primary);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger-toggle i {
+    font-size: 24px;
+    color: white;
+}
+
+.hamburger-toggle:hover {
+    transform: scale(1.05);
+}
+
+/* Overlay (backdrop) */
+.hamburger-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.hamburger-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    /* Hidden off-screen */
+    width: 280px;
+    height: 100vh;
+    background: var(--background);
+    z-index: 1000;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.hamburger-menu.active {
+    left: 0;
+    /* Slide in */
+}
+
+/* Menu Header */
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menu-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.menu-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-dark);
+    padding: 5px;
+    transition: transform 0.2s ease;
+}
+
+.menu-close:hover {
+    transform: rotate(90deg);
+    color: var(--primary);
+}
+
+/* Menu Items */
+.menu-items {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    flex: 1;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 25px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    color: var(--text-dark);
+}
+
+.menu-item i {
+    font-size: 20px;
+    margin-right: 15px;
+    color: var(--primary);
+    width: 24px;
+    text-align: center;
+}
+
+.menu-item span {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.menu-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+    padding-left: 30px;
+}
+
+.menu-item.active {
+    background: linear-gradient(90deg, rgba(168, 218, 220, 0.15), transparent);
+    border-left-color: var(--primary);
+    color: var(--primary);
+}
+
+.menu-item.active i {
+    color: var(--primary);
+}
+
+.menu-logout {
+    margin-top: auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.menu-logout:hover {
+    background: rgba(220, 53, 69, 0.05);
+    color: #dc3545;
+}
+
+.menu-logout i {
+    color: #dc3545;
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .hamburger-menu {
+    background: #2a2a2a;
+    border-right: 1px solid #333;
+}
+
+.dark-mode .menu-header {
+    border-bottom-color: #333;
+}
+
+.dark-mode .menu-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .menu-item.active {
+    background: linear-gradient(90deg, rgba(168, 218, 220, 0.1), transparent);
+}
+
+.dark-mode .menu-logout {
+    border-top-color: #333;
+}
+
+/* Mobile Only Visibility Logic */
+@media (max-width: 768px) {
+    .hamburger-toggle {
+        display: flex;
+    }
+
+    .quick-actions.desktop-only {
+        display: none !important;
+    }
+
+    /* Adjust main container padding if needed */
+    #app-container {
+        padding-top: 0;
+    }
+}
+
+/* Desktop: Hide hamburger elements */
+@media (min-width: 769px) {
+
+    .hamburger-toggle,
+    .hamburger-overlay,
+    .hamburger-menu {
+        display: none !important;
     }
 }
